@@ -1,14 +1,15 @@
 package blockchain;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 public class BlockTest {
-
     @Test
+    @DisplayName("Time Test")
     public void testTime() {
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();

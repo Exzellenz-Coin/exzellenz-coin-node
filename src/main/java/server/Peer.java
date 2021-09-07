@@ -2,17 +2,17 @@ package server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import server.message.IMessage;
+import server.message.AbstractMessage;
 
 import java.io.*;
 import java.net.Socket;
 
 public class Peer extends Thread {
-    private Socket socket;
-    private Server server;
-    private BufferedWriter writer;
-    private BufferedReader reader;
-    private ObjectMapper mapper = new ObjectMapper();
+    protected Socket socket;
+    protected Server server;
+    protected BufferedWriter writer;
+    protected BufferedReader reader;
+    protected ObjectMapper mapper = new ObjectMapper();
 
     public Peer(Socket socket, Server server) throws IOException {
         this.socket = socket;
@@ -21,7 +21,7 @@ public class Peer extends Thread {
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
-    public void send(IMessage message) throws IOException {
+    public void send(AbstractMessage message) throws IOException {
         writer.write(mapper.writeValueAsString(message));
         writer.newLine();
         writer.flush();
@@ -33,18 +33,22 @@ public class Peer extends Thread {
             reader.lines().forEach(line -> {
                 System.out.println("Received: " + line);
                 try {
-                    IMessage message = mapper.readValue(line, IMessage.class);
+                    AbstractMessage message = mapper.readValue(line, AbstractMessage.class);
+                    if (server.hasReceivedMessage(message.getId()))
+                        return;
+                    server.cacheReceivedMessage(message.getId());
                     message.handle();
-                    if (server != null)
+                    if (server != null && server.shouldRelayMessages())
                         server.sendToAll(message);
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
             });
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
+        } finally {
+            if (server != null)
+                server.remove(this);
         }
-        if (server != null)
-            server.remove(this);
     }
 }

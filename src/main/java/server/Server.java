@@ -1,26 +1,38 @@
 package server;
 
-import server.message.IMessage;
+import server.message.AbstractMessage;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Server extends Thread {
-    private static final int PORT = 1337;
-    private List<Peer> peers;
-    private boolean shutdown;
+    protected static final int DEFAULT_PORT = 1337;
+    protected static final int MAX_MSG_CACHE_SIZE = 100;
+    protected List<Peer> peers;
+    protected List<UUID> receivedMessages;
+    protected final int port;
+    protected boolean shutdown;
+    protected boolean relayMessages;
 
-    public Server() throws IOException {
+    public Server() {
+        this(DEFAULT_PORT);
+    }
+
+    public Server(int port) {
+        this.port = port;
         this.peers = new ArrayList<>();
+        this.receivedMessages = new LinkedList<>();
+        this.shutdown = false;
+        this.relayMessages = true;
     }
 
     public void connectToPeer(String hostName, int port) throws IOException {
         System.out.println("Connection to: " + hostName + ":" + port);
         Socket socket = new Socket(hostName, port);
         Peer peer = new Peer(socket, this);
+        peer.start();
         peers.add(peer);
     }
 
@@ -29,7 +41,9 @@ public class Server extends Thread {
         this.interrupt();
     }
 
-    public void sendToAll(IMessage message) {
+    public void sendToAll(AbstractMessage message) {
+        cacheReceivedMessage(message.getId());
+        System.out.println("Sending message to " + peers.size() + " peers");
         for (Peer peer : peers) {
             try {
                 peer.send(message);
@@ -44,10 +58,22 @@ public class Server extends Thread {
         peers.remove(peer);
     }
 
+    public void cacheReceivedMessage(UUID id) {
+        if (hasReceivedMessage(id))
+            return;
+        receivedMessages.add(id);
+        if (receivedMessages.size() > MAX_MSG_CACHE_SIZE)
+            receivedMessages.remove(0);
+    }
+
+    public boolean hasReceivedMessage(UUID id) {
+        return receivedMessages.contains(id);
+    }
+
     @Override
     public void run() {
         System.out.println("Starting node...");
-        try (var serverSocket = new ServerSocket(PORT)) {
+        try (var serverSocket = new ServerSocket(port)) {
             while (!shutdown) {
                 try {
                     Socket newSocket = serverSocket.accept();
@@ -71,8 +97,16 @@ public class Server extends Thread {
             thread.start();
             Thread.sleep(60 * 1000);
             server.shutdown();
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean shouldRelayMessages() {
+        return relayMessages;
+    }
+
+    public void setRelayMessages(boolean relayMessages) {
+        this.relayMessages = relayMessages;
     }
 }

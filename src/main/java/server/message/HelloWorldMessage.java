@@ -2,7 +2,7 @@ package server.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class HelloWorldMessage implements IMessage {
+public class HelloWorldMessage extends AbstractMessage {
     @JsonProperty
     private final String name;
 

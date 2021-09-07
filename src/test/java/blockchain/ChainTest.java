@@ -1,6 +1,7 @@
 package blockchain;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -9,7 +10,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ChainTest {
-
     public Chain chain;
 
     @BeforeEach
@@ -18,11 +18,13 @@ public class ChainTest {
     }
 
     @Test
+    @DisplayName("Header Creation Test")
     public void testHeaderCreation() {
         assertNotNull(chain.getHead());
     }
 
     @Test
+    @DisplayName("Block Addition Test")
     public void testBlockAddition() {
         Wallet wallet1 = new Wallet();
         Wallet wallet2 = new Wallet();
@@ -33,6 +35,7 @@ public class ChainTest {
     }
 
     @Test
+    @DisplayName("Illegal Block Addition Test")
     public void testIllegalBlockAddition() {
         Transaction transaction = new Transaction(UUID.randomUUID(), UUID.randomUUID(), BigDecimal.ONE, new byte[0]);
         Block illegalBlock = new Block("I am an illegal hash :)", transaction);
@@ -40,6 +43,7 @@ public class ChainTest {
     }
 
     @Test
+    @DisplayName("Amount Calculation Test")
     public void testAmountCalculation() {
         Wallet wallet1 = new Wallet();
         Wallet wallet2 = new Wallet();
