@@ -45,8 +45,8 @@ public class Block {
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(previous, transaction, timeStamp);
+	public int hashCode() { // remove hash when hash on server side will be set by miner accordance
+		return Objects.hash(previous, transaction, timeStamp, hash);
 	}
 
 	@Override

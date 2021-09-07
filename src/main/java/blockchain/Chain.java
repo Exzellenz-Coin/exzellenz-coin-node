@@ -12,15 +12,17 @@ public class Chain {
 
 	public Chain() {
 		blockChain = new ArrayList<>();
-		addBlock(START_BLOCK); //TODO: first entry in the blockchain
+		blockChain.add(START_BLOCK); //TODO: first entry in the blockchain
 	}
 
 	public void addBlock(final Block block) {
+		if (!block.getPrevious().equals(getHead().getHash()))
+			throw new IllegalArgumentException("Block must have the current head as previous block!");
 		blockChain.add(block);
 	}
 
 	public void addBlock(final String previous, final UUID sourceWalletID, final UUID targetWalletID, final BigDecimal amount, final byte[] signature) {
-		blockChain.add(new Block(previous, new Transaction(sourceWalletID, targetWalletID, amount, signature)));
+		addBlock(new Block(previous, new Transaction(sourceWalletID, targetWalletID, amount, signature)));
 	}
 
 	public Block getHead() {
