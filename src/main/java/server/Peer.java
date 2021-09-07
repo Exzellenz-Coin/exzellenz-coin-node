@@ -31,9 +31,9 @@ public class Peer extends Thread {
     public void run() {
         try {
             reader.lines().forEach(line -> {
-                System.out.println("Received: " + line);
                 try {
-                    AbstractMessage message = mapper.readValue(line, AbstractMessage.class);
+                    var message = mapper.readValue(line, AbstractMessage.class);
+                    System.out.printf("Received message of type \"%s\" with id \"%s\"%n", message.getClass().getSimpleName(), message.getId());
                     if (server.hasReceivedMessage(message.getId()))
                         return;
                     server.cacheReceivedMessage(message.getId());
