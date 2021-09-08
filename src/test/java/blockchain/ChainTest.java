@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,24 +24,28 @@ public class ChainTest {
 		assertNotNull(chain.getHead());
 	}
 
-    @Test
-    @DisplayName("Block Addition Test")
-    public void testBlockAddition() {
-        Wallet wallet1 = new Wallet();
-        Wallet wallet2 = new Wallet();
-        Transaction transaction = new Transaction(wallet1.getId(), wallet2.getId(), BigDecimal.TEN, new byte[0]);
-        Block block = new Block(chain.getHead().getHash(), transaction);
-        chain.addBlock(block);
-        assertEquals(block, chain.getHead(), "A wrong head was set for the blockchain!");
-    }
+	@Test
+	@DisplayName("Block Addition Test")
+	public void testBlockAddition() {
+		Wallet wallet1 = new Wallet();
+		Wallet wallet2 = new Wallet();
+		Transaction transaction = new Transaction(wallet1.getPublicKey(), wallet2.getPublicKey(), BigDecimal.TEN, new byte[0]);
+		Block block = new Block(chain.getHead().getHash(), Collections.singletonList(transaction),
+				null, null);
+		chain.addBlock(block);
+		assertEquals(block, chain.getHead(), "A wrong head was set for the blockchain!");
+	}
 
-    @Test
-    @DisplayName("Illegal Block Addition Test")
-    public void testIllegalBlockAddition() {
-        Transaction transaction = new Transaction(UUID.randomUUID(), UUID.randomUUID(), BigDecimal.ONE, new byte[0]);
-        Block illegalBlock = new Block("I am an illegal hash :)", transaction);
-        assertThrows(IllegalArgumentException.class, () -> chain.addBlock(illegalBlock));
-    }
+	@Test
+	@DisplayName("Illegal Block Addition Test")
+	public void testIllegalBlockAddition() {
+		Wallet wallet1 = new Wallet();
+		Wallet wallet2 = new Wallet();
+		Transaction transaction = new Transaction(wallet1.getPublicKey(), wallet2.getPublicKey(), BigDecimal.ONE, new byte[0]);
+		Block illegalBlock = new Block("I am an illegal hash :)", Collections.singletonList(transaction),
+				null, null);
+		assertThrows(IllegalArgumentException.class, () -> chain.addBlock(illegalBlock));
+	}
 
 	@Test
 	@DisplayName("Amount Calculation Test")

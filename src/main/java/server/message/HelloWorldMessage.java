@@ -2,6 +2,8 @@ package server.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import server.node.INode;
+
 public class HelloWorldMessage extends AbstractMessage {
     @JsonProperty
     private final String name;
@@ -14,7 +16,8 @@ public class HelloWorldMessage extends AbstractMessage {
         this.name = name;
     }
 
-    public void handle() {
+    @Override
+    public void handle(INode node) {
         System.out.println("Hello " + name);
     }
 }

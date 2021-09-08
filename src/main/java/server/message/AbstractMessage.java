@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.UUID;
 
+import server.node.INode;
+
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         property = "type"
@@ -23,5 +25,5 @@ public abstract class AbstractMessage {
         return id;
     }
 
-    public abstract void handle();
+    public abstract void handle(INode node);
 }

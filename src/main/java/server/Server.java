@@ -1,6 +1,9 @@
 package server;
 
 import server.message.AbstractMessage;
+import server.message.MessageCache;
+import server.node.FullNode;
+import server.node.INode;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -13,25 +16,25 @@ import java.util.UUID;
 public class Server extends Thread {
     protected static final int DEFAULT_PORT = 1337;
     protected static final int MAX_MSG_CACHE_SIZE = 100;
+    protected final INode node;
     protected final int port;
     protected List<Peer> peers;
-    protected List<UUID> receivedMessages;
+    protected MessageCache receivedMessages;
     protected boolean shutdown;
-    protected boolean relayMessages;
 
-    public Server() {
-        this(DEFAULT_PORT);
+    public Server(INode node) {
+        this(DEFAULT_PORT, node);
     }
 
-    public Server(int port) {
+    public Server(int port, INode node) {
+    	this.node = node;
         this.port = port;
         this.peers = new ArrayList<>();
-        this.receivedMessages = new LinkedList<>();
+        this.receivedMessages = new MessageCache(MAX_MSG_CACHE_SIZE);
         this.shutdown = false;
-        this.relayMessages = true;
     }
 
-    public void connectToPeer(String hostName, int port) throws IOException {
+	public void connectToPeer(String hostName, int port) throws IOException {
         System.out.printf("Connecting to: %s:%s%n", hostName, port);
         createPeer(new Socket(hostName, port));
     }
@@ -59,11 +62,7 @@ public class Server extends Thread {
     }
 
     public void cacheReceivedMessage(UUID id) {
-        if (hasReceivedMessage(id))
-            return;
         receivedMessages.add(id);
-        if (receivedMessages.size() > MAX_MSG_CACHE_SIZE)
-            receivedMessages.remove(0);
     }
 
     public boolean hasReceivedMessage(UUID id) {
@@ -94,11 +93,8 @@ public class Server extends Thread {
         peers.add(peer);
     }
 
-    public boolean shouldRelayMessages() {
-        return relayMessages;
-    }
+    public INode getNode() {
+    	return node;
+	}
 
-    public void setRelayMessages(boolean relayMessages) {
-        this.relayMessages = relayMessages;
-    }
 }

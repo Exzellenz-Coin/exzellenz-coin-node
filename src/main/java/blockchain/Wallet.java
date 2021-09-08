@@ -4,16 +4,15 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
-import java.util.UUID;
+import java.util.Objects;
 
 public class Wallet {
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+	static {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
-    private final UUID id = UUID.randomUUID();
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+	private PrivateKey privateKey;
+	private PublicKey publicKey;
 
 	public Wallet() {
 		try {

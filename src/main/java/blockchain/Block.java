@@ -21,17 +21,17 @@ public class Block {
         return previous;
     }
 
-    public String getHash() {
-        return hash;
-    }
+	public String getHash() {
+		return hash;
+	}
 
     public Transaction getTransaction() {
         return transaction;
     }
 
-    public long getTimeStamp() {
-        return timeStamp;
-    }
+	public long getTimeStamp() {
+		return timeStamp;
+	}
 
     @Override
     public boolean equals(final Object o) {
