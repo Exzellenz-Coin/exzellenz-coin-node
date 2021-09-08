@@ -1,10 +1,8 @@
-package blockchain;
+package mainpackage.blockchain;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Objects;
-import java.util.UUID;
 
 public class Chain {
 	public static final Wallet ROOT_WALLET = new Wallet(); // MOVE TO SERVER LATER maybe
@@ -13,7 +11,7 @@ public class Chain {
 
 	public Chain() {
 		blockChain = new ArrayList<>();
-		blockChain.add(START_BLOCK); //first entry in the blockchain
+		blockChain.add(START_BLOCK); //first entry in the mainpackage.blockchain
 	}
 
 	public void addBlock(final Block block) {

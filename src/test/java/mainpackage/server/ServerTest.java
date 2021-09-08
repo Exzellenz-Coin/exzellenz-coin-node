@@ -1,10 +1,8 @@
-package server;
+package mainpackage.server;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import server.message.HelloWorldMessage;
-import server.node.FullNode;
-import server.node.INode;
+import mainpackage.server.message.HelloWorldMessage;
 
 import java.io.IOException;
 
@@ -26,7 +24,7 @@ public class ServerTest {
         node3.getServer().connectToPeer("localhost", 10001);
         Thread.sleep(100);
 
-        // Test if all server are connected properly
+        // Test if all mainpackage.server are connected properly
         assertEquals(1, node1.getServer().getPeers().size(), "Server 1 has not the correct number of peers");
         assertEquals(2, node2.getServer().getPeers().size(), "Server 2 has not the correct number of peers");
         assertEquals(1, node3.getServer().getPeers().size(), "Server 3 has not the correct number of peers");
@@ -35,8 +33,8 @@ public class ServerTest {
         HelloWorldMessage message = new HelloWorldMessage();
         node1.getServer().sendToAll(message);
         Thread.sleep(100);
-        assertTrue(node1.getServer().hasReceivedMessage(message.getId()), "Message was not received by server 1");
-        assertTrue(node2.getServer().hasReceivedMessage(message.getId()), "Message was not received by server 2");
-        assertTrue(node3.getServer().hasReceivedMessage(message.getId()), "Message was not received by server 3");
+        assertTrue(node1.getServer().hasReceivedMessage(message.getId()), "Message was not received by mainpackage.server 1");
+        assertTrue(node2.getServer().hasReceivedMessage(message.getId()), "Message was not received by mainpackage.server 2");
+        assertTrue(node3.getServer().hasReceivedMessage(message.getId()), "Message was not received by mainpackage.server 3");
     }
 }

@@ -1,4 +1,4 @@
-package server.message;
+package mainpackage.server.message;
 
 import java.util.LinkedHashSet;
 import java.util.UUID;

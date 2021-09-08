@@ -1,8 +1,8 @@
-package server.message;
+package mainpackage.server.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import server.node.INode;
+import mainpackage.server.node.INode;
 
 public class HelloWorldMessage extends AbstractMessage {
     @JsonProperty

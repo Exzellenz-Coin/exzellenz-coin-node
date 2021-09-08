@@ -1,29 +1,21 @@
-package blockchain;
+package mainpackage.blockchain;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Block {
 	//private final static PublicKey FOUNDER_WALLET; //initially all coins here
 	private final String prevHash; //hash of the previous block
 	private final long timeStamp;
-	private final List<Transaction> transactions;
+	private final List<mainpackage.blockchain.Transaction> transactions;
 	private PublicKey validator;
 	private final Signature signature;
 	private final String hash; //hash of this block
 
-	public Block(String prevHash, List<Transaction> transactions, PublicKey validator, Signature signature) {
+	public Block(String prevHash, List<mainpackage.blockchain.Transaction> transactions, PublicKey validator, Signature signature) {
 		this.prevHash = prevHash;
 		this.transactions = transactions;
 		this.validator = validator;
@@ -40,7 +32,7 @@ public class Block {
 		return hash;
 	}
 
-	public List<Transaction> getTransactions() {
+	public List<mainpackage.blockchain.Transaction> getTransactions() {
 		return transactions;
 	}
 

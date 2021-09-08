@@ -1,17 +1,15 @@
-package server;
-
-import server.message.AbstractMessage;
-import server.message.MessageCache;
-import server.node.FullNode;
-import server.node.INode;
+package mainpackage.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+
+import mainpackage.server.message.AbstractMessage;
+import mainpackage.server.message.MessageCache;
+import mainpackage.server.node.INode;
 
 public class Server extends Thread {
     protected static final int DEFAULT_PORT = 1337;

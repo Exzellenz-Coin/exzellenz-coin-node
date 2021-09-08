@@ -1,13 +1,17 @@
-package server;
+package mainpackage.server;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import server.message.AbstractMessage;
-import server.node.INode;
-import util.JsonMapper;
 
-import java.io.*;
-import java.net.Socket;
+import mainpackage.server.message.AbstractMessage;
+import mainpackage.server.node.INode;
+import mainpackage.util.JsonMapper;
 
 public class Peer extends Thread {
     protected Socket socket;

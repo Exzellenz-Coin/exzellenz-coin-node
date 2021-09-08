@@ -1,4 +1,4 @@
-package blockchain;
+package mainpackage.blockchain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +32,7 @@ public class ChainTest {
 		Block block = new Block(chain.getHead().getHash(), Collections.singletonList(transaction),
 				null, null);
 		chain.addBlock(block);
-		assertEquals(block, chain.getHead(), "A wrong head was set for the blockchain!");
+		assertEquals(block, chain.getHead(), "A wrong head was set for the mainpackage.blockchain!");
 	}
 
 	@Test

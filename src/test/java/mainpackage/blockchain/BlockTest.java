@@ -1,4 +1,4 @@
-package blockchain;
+package mainpackage.blockchain;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.UUID;
 
 public class BlockTest {
 	@Test

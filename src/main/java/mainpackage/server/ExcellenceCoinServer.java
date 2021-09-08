@@ -1,7 +1,7 @@
-package server;
+package mainpackage.server;
 
-import server.node.FullNode;
-import server.node.INode;
+import mainpackage.server.node.FullNode;
+import mainpackage.server.node.INode;
 
 public class ExcellenceCoinServer {
 	public static void main(String[] args) {

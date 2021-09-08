@@ -1,9 +1,7 @@
-package server;
+package mainpackage.server;
 
-import java.io.IOException;
-
-import blockchain.Block;
-import server.node.INode;
+import mainpackage.blockchain.Block;
+import mainpackage.server.node.INode;
 
 public class TestNode implements INode {
 	private final TestServer server;

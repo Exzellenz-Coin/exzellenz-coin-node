@@ -1,6 +1,6 @@
-package blockchain;
+package mainpackage.blockchain;
 
-import util.JsonMapper;
+import mainpackage.util.JsonMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;

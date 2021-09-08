@@ -1,10 +1,9 @@
-package blockchain;
+package mainpackage.blockchain;
 
 import java.math.BigDecimal;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
 
 public class Transaction {
     private final PublicKey sourceWalletId;

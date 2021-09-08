@@ -1,8 +1,8 @@
-package server;
+package mainpackage.server;
 
 import java.util.List;
 
-import server.node.INode;
+import mainpackage.server.node.INode;
 
 public class TestServer extends Server {
     public TestServer(int port, INode node) {

@@ -1,10 +1,18 @@
-package blockchain;
+package mainpackage.blockchain;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Objects;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Wallet {
 	static {

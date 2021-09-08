@@ -1,7 +1,7 @@
-package server.node;
+package mainpackage.server.node;
 
-import blockchain.Block;
-import server.Server;
+import mainpackage.blockchain.Block;
+import mainpackage.server.Server;
 
 public interface INode {
 	void start();
