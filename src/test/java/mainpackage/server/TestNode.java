@@ -1,36 +1,18 @@
 package mainpackage.server;
 
-import mainpackage.blockchain.Block;
-import mainpackage.server.node.INode;
+import mainpackage.server.node.FullNode;
+import mainpackage.server.node.NodeEntry;
 
-public class TestNode implements INode {
-	private final TestServer server;
+public class TestNode extends FullNode {
 
-	public TestNode(int port) {
-		this.server = new TestServer(port, this);
-	}
+    public TestNode(int port) {
+        super();
+        this.server = new TestServer(port, this);
+    }
 
-	@Override
-	public void start() {
-		server.start();
-	}
+    @Override
+    public NodeEntry getNodeEntry() {
+        return new NodeEntry("localhost", getServer().port);
+    }
 
-	@Override
-	public void stop() {
-		server.shutdown();
-	}
-
-	@Override
-	public void mineBlock(Block block) {
-		//return;
-	}
-
-	public boolean shouldRelayMessages() {
-		return true;
-	}
-
-	@Override
-	public TestServer getServer() {
-		return server;
-	}
 }

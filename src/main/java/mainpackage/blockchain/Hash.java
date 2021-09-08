@@ -8,7 +8,7 @@ public class Hash {
 
 	public static String createHash(Block block) { //hash based on contents of a block
 		final StringBuilder builder = new StringBuilder();
-		builder.append(block.getPrevious())
+		builder.append(block.getPrevHash())
 				.append(DELIMITER)
 				.append(block.getTimeStamp());
 		for (final Transaction transaction : block.getTransactions()) {

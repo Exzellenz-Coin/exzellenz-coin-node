@@ -10,12 +10,12 @@ public class Block {
 	//private final static PublicKey FOUNDER_WALLET; //initially all coins here
 	private final String prevHash; //hash of the previous block
 	private final long timeStamp;
-	private final List<mainpackage.blockchain.Transaction> transactions;
+	private final List<Transaction> transactions;
 	private PublicKey validator;
 	private final Signature signature;
 	private final String hash; //hash of this block
 
-	public Block(String prevHash, List<mainpackage.blockchain.Transaction> transactions, PublicKey validator, Signature signature) {
+	public Block(String prevHash, List<Transaction> transactions, PublicKey validator, Signature signature) {
 		this.prevHash = prevHash;
 		this.transactions = transactions;
 		this.validator = validator;
@@ -24,7 +24,7 @@ public class Block {
 		this.hash = Hash.createHash(this);
 	}
 
-	public String getPrevious() {
+	public String getPrevHash() {
 		return prevHash;
 	}
 
@@ -32,7 +32,7 @@ public class Block {
 		return hash;
 	}
 
-	public List<mainpackage.blockchain.Transaction> getTransactions() {
+	public List<Transaction> getTransactions() {
 		return transactions;
 	}
 

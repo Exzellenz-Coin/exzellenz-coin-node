@@ -1,15 +1,18 @@
 package mainpackage.server;
 
+import mainpackage.server.message.AbstractMessage;
+import mainpackage.server.message.ConnectMessage;
+import mainpackage.server.message.JoinNetworkMessage;
+import mainpackage.server.message.RequestNetworkMessage;
+import mainpackage.server.node.INode;
+import mainpackage.server.node.NodeEntry;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import mainpackage.server.message.AbstractMessage;
-import mainpackage.server.message.MessageCache;
-import mainpackage.server.node.INode;
 
 public class Server extends Thread {
     protected static final int DEFAULT_PORT = 1337;
@@ -25,16 +28,25 @@ public class Server extends Thread {
     }
 
     public Server(int port, INode node) {
-    	this.node = node;
+        this.node = node;
         this.port = port;
         this.peers = new ArrayList<>();
         this.receivedMessages = new MessageCache(MAX_MSG_CACHE_SIZE);
         this.shutdown = false;
     }
 
-	public void connectToPeer(String hostName, int port) throws IOException {
+    public void connectToPeer(String hostName, int port) throws IOException {
         System.out.printf("Connecting to: %s:%s%n", hostName, port);
-        createPeer(new Socket(hostName, port));
+        var peer = createPeer(new Socket(hostName, port), new NodeEntry(hostName, port));
+        peer.send(new ConnectMessage(node.getNodeEntry()));
+    }
+
+    public void doInitialConnect() throws IOException {
+        if (peers.size() == 0) return;
+        if (node.getNetwork().size() > 1) return;
+        var peer = peers.get(0);
+        peer.send(new JoinNetworkMessage(node.getNodeEntry()));
+        peer.send(new RequestNetworkMessage());
     }
 
     public void shutdown() {
@@ -75,7 +87,7 @@ public class Server extends Thread {
                 try {
                     var socket = serverSocket.accept();
                     System.out.printf("Connection from: %s:%s%n", socket.getInetAddress(), socket.getPort());
-                    createPeer(socket);
+                    createPeer(socket, null);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -85,14 +97,18 @@ public class Server extends Thread {
         }
     }
 
-    protected void createPeer(Socket socket) throws IOException {
+    protected Peer createPeer(Socket socket, NodeEntry nodeEntry) throws IOException {
         var peer = new Peer(socket, this);
         peer.start();
         peers.add(peer);
+        return peer;
     }
 
     public INode getNode() {
-    	return node;
-	}
+        return node;
+    }
 
+    public int getPort() {
+        return port;
+    }
 }

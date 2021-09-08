@@ -7,5 +7,9 @@ public class ExcellenceCoinServer {
 	public static void main(String[] args) {
 		INode node = new FullNode();
 		node.start();
+		/*
+		node.getServer().connectToPeer(null, 0);
+		node.getServer().doInitialConnect();
+		 */
 	}
 }

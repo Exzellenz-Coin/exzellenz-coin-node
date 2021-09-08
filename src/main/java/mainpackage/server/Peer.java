@@ -1,22 +1,20 @@
 package mainpackage.server;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import mainpackage.server.message.AbstractMessage;
+import mainpackage.server.message.LeaveNetworkMessage;
 import mainpackage.server.node.INode;
+import mainpackage.server.node.NodeEntry;
 import mainpackage.util.JsonMapper;
+
+import java.io.*;
+import java.net.Socket;
 
 public class Peer extends Thread {
     protected Socket socket;
 	protected INode node;
     protected Server server;
+    protected NodeEntry nodeEntry;
     protected BufferedWriter writer;
     protected BufferedReader reader;
 
@@ -45,8 +43,8 @@ public class Peer extends Thread {
                     if (server.hasReceivedMessage(message.getId()))
                         return;
                     server.cacheReceivedMessage(message.getId());
-                    message.handle(node);
-                    if (node.shouldRelayMessages())
+                    message.handle(this);
+                    if (message.shouldRelay() && node.shouldRelayMessages())
                         server.sendToAll(message);
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
@@ -55,8 +53,26 @@ public class Peer extends Thread {
         } catch (Exception ignored) {
 
         } finally {
+            if (node.getNetwork().contains(nodeEntry))
+                server.sendToAll(new LeaveNetworkMessage(nodeEntry));
             if (server != null)
                 server.remove(this);
         }
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public INode getNode() {
+        return node;
+    }
+
+    public NodeEntry getNodeEntry() {
+        return nodeEntry;
+    }
+
+    public void setNodeEntry(NodeEntry nodeEntry) {
+        this.nodeEntry = nodeEntry;
     }
 }

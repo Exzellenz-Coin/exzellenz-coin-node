@@ -2,7 +2,7 @@ package mainpackage.server.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import mainpackage.server.node.INode;
+import mainpackage.server.Peer;
 
 public class HelloWorldMessage extends AbstractMessage {
     @JsonProperty
@@ -17,7 +17,12 @@ public class HelloWorldMessage extends AbstractMessage {
     }
 
     @Override
-    public void handle(INode node) {
+    public void handle(Peer sender) {
         System.out.println("Hello " + name);
+    }
+
+    @Override
+    public boolean shouldRelay() {
+        return true;
     }
 }
