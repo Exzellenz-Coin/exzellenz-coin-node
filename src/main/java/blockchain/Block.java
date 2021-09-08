@@ -8,12 +8,14 @@ public class Block {
     private final Transaction transaction;
     private final String hash;
 
-    public Block(String previous, Transaction transaction) {
-        this.previous = previous;
-        this.transaction = transaction;
-        this.timeStamp = System.currentTimeMillis();
-        this.hash = Hash.createHash(this);
-    }
+	public Block(String prevHash, List<Transaction> transactions, PublicKey validator, Signature signature) {
+		this.prevHash = prevHash;
+		this.transactions = transactions;
+		this.validator = validator;
+		this.signature = signature;
+		this.timeStamp = System.currentTimeMillis();
+		this.hash = Hash.createHash(this);
+	}
 
     public String getPrevious() {
         return previous;

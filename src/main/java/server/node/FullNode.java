@@ -1,16 +1,36 @@
 package server.node;
 
-import server.Client;
+import blockchain.Block;
 import server.Server;
 
-import java.io.IOException;
-
 public class FullNode implements INode {
-    private Client client;
-    private Server server;
+	private final Server server;
 
-    public FullNode(String hostName, int port) throws IOException {
-        this.client = new Client(hostName, port);
-        this.server = new Server();
-    }
+	public FullNode() {
+		this.server = new Server(this);
+	}
+
+	@Override
+	public void start() {
+		server.start();
+	}
+
+	@Override
+	public void stop() {
+		server.shutdown();
+	}
+
+	@Override
+	public void mineBlock(Block block) {
+		// TODO
+	}
+
+	public boolean shouldRelayMessages() {
+		return true;
+	}
+
+	@Override
+	public Server getServer() {
+		return server;
+	}
 }

@@ -32,8 +32,9 @@ public class Peer extends Thread {
         try {
             reader.lines().forEach(line -> {
                 try {
-                    var message = mapper.readValue(line, AbstractMessage.class);
-                    System.out.printf("Received message of type \"%s\" with id \"%s\"%n", message.getClass().getSimpleName(), message.getId());
+                    var message = JsonMapper.mapper.readValue(line, AbstractMessage.class);
+                    System.out.printf("Received message of type \"%s\" with id \"%s\"%n",
+							message.getClass().getSimpleName(), message.getId());
                     if (server.hasReceivedMessage(message.getId()))
                         return;
                     server.cacheReceivedMessage(message.getId());
