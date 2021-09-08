@@ -7,9 +7,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Chain {
-    public static final Wallet ROOT_WALLET = new Wallet(); // MOVE TO SERVER LATER maybe
-    private static final Block START_BLOCK = new Block("0", new Transaction(null, null, null, null));
-    private final ArrayList<Block> blockChain;
+	public static final Wallet ROOT_WALLET = new Wallet(); // MOVE TO SERVER LATER maybe
+	private static final Block START_BLOCK = Block.createGenesisBlock();
+	private final ArrayList<Block> blockChain;
 
 	public Chain() {
 		blockChain = new ArrayList<>();

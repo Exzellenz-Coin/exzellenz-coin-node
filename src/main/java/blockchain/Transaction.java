@@ -1,28 +1,29 @@
 package blockchain;
 
 import java.math.BigDecimal;
+import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
 public class Transaction {
-    private final UUID sourceWalletId;
-    private final UUID targetWalletId;
+    private final PublicKey sourceWalletId;
+    private final PublicKey targetWalletId;
     private final BigDecimal amount;
     private byte[] signature;
 
-    public Transaction(UUID sourceWalletId, UUID targetWalletId, BigDecimal amount, byte[] signature) {
+    public Transaction(PublicKey sourceWalletId, PublicKey targetWalletId, BigDecimal amount, byte[] signature) {
         this.sourceWalletId = sourceWalletId;
         this.targetWalletId = targetWalletId;
         this.amount = amount;
         this.signature = signature;
     }
 
-    public UUID getSourceWalletId() {
+    public PublicKey getSourceWalletId() {
         return sourceWalletId;
     }
 
-    public UUID getTargetWalletId() {
+    public PublicKey getTargetWalletId() {
         return targetWalletId;
     }
 
