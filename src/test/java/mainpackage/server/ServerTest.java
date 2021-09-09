@@ -1,15 +1,16 @@
 package mainpackage.server;
 
 import mainpackage.server.message.HelloWorldMessage;
+import mainpackage.server.node.NodeEntry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerTest {
     private static final int BASE_PORT = 13000;
@@ -45,26 +46,30 @@ public class ServerTest {
     @Test
     @DisplayName("Network Synchronisation Test")
     public void networkSyncTest() throws IOException, InterruptedException {
+        HashSet<NodeEntry> expectedSet = new HashSet<>();
         // Create and connect the servers
         TestNode node1 = new TestNode(BASE_PORT + 3);
         node1.start();
-        assertEquals(1, node1.getNetwork().size(), "Node 1 does not know itself");
+        expectedSet.add(node1.getNodeEntry());
+        assertEquals(expectedSet, node1.getNetwork(), "Node 1 does not know the correct network members");
 
         TestNode node2 = new TestNode(BASE_PORT + 4);
         node2.start();
+        expectedSet.add(node2.getNodeEntry());
         node2.getServer().connectToPeer("localhost", BASE_PORT + 3);
         node2.getServer().doInitialConnect();
         Thread.sleep(100);
-        assertEquals(2, node1.getNetwork().size(), "Node 1 does not know all network members");
-        assertEquals(2, node2.getNetwork().size(), "Node 2 does not know all network members");
+        assertEquals(expectedSet, node1.getNetwork(), "Node 1 does not know the correct network members");
+        assertEquals(expectedSet, node2.getNetwork(), "Node 2 does not know the correct network members");
 
         TestNode node3 = new TestNode(BASE_PORT + 5);
         node3.start();
+        expectedSet.add(node3.getNodeEntry());
         node3.getServer().connectToPeer("localhost", BASE_PORT + 4);
         node3.getServer().doInitialConnect();
         Thread.sleep(100);
-        assertEquals(3, node1.getNetwork().size(), "Node 1 does not know all network members");
-        assertEquals(3, node2.getNetwork().size(), "Node 2 does not know all network members");
-        assertEquals(3, node3.getNetwork().size(), "Node 3 does not know all network members");
+        assertEquals(expectedSet, node1.getNetwork(), "Node 1 does not know the correct network members");
+        assertEquals(expectedSet, node2.getNetwork(), "Node 2 does not know the correct network members");
+        assertEquals(expectedSet, node3.getNetwork(), "Node 3 does not know the correct network members");
     }
 }

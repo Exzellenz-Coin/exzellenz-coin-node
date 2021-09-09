@@ -3,18 +3,21 @@ package mainpackage.server.node;
 import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
 import mainpackage.server.Server;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FullNode implements INode {
+	protected static final Logger logger = LogManager.getLogger(FullNode.class);
 	protected Server server;
-	protected final List<NodeEntry> network;
+	protected final Set<NodeEntry> network;
 	protected final Chain blockChain;
 
 	public FullNode() {
 		this.server = new Server(this);
-		this.network = new ArrayList<>();
+		this.network = new HashSet<>();
 		this.blockChain = null; //TODO: load blockchain from storage
 		//TODO: request peer blockchain length, and update if current blockchain is smaller
 	}
@@ -22,7 +25,7 @@ public class FullNode implements INode {
 	@Override
 	public void start() {
 		server.start();
-		network.add(getNodeEntry());
+		resetNetwork();
 	}
 
 	@Override
@@ -42,8 +45,30 @@ public class FullNode implements INode {
 	}
 
 	@Override
-	public List<NodeEntry> getNetwork() {
+	public Set<NodeEntry> getNetwork() {
 		return network;
+	}
+
+	@Override
+	public void resetNetwork() {
+		network.clear();
+		network.add(getNodeEntry());
+	}
+
+	@Override
+	public boolean addNodeEntry(NodeEntry nodeEntry) {
+		boolean added = network.add(nodeEntry);
+		if (added)
+			logger.debug("Added node %s from network".formatted(nodeEntry));
+		return added;
+	}
+
+	@Override
+	public boolean removeNodeEntry(NodeEntry nodeEntry) {
+		boolean removed = network.remove(nodeEntry);
+		if (removed)
+			logger.debug("Removed node %s from network".formatted(nodeEntry));
+		return removed;
 	}
 
 	@Override

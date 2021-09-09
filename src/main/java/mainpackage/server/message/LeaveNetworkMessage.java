@@ -17,7 +17,7 @@ public class LeaveNetworkMessage extends AbstractMessage {
 
     @Override
     public void handle(Peer sender) {
-        sender.getNode().getNetwork().remove(nodeEntry);
+        sender.getNode().removeNodeEntry(nodeEntry);
     }
 
     @Override

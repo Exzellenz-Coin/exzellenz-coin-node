@@ -5,23 +5,23 @@ import mainpackage.server.Peer;
 import mainpackage.server.node.NodeEntry;
 
 import java.util.List;
+import java.util.Set;
 
 public class SendNetworkMessage extends AbstractMessage {
     @JsonProperty
-    private List<NodeEntry> network;
+    private Set<NodeEntry> network;
 
     private SendNetworkMessage() {
     }
 
-    public SendNetworkMessage(List<NodeEntry> network) {
+    public SendNetworkMessage(Set<NodeEntry> network) {
         this.network = network;
     }
 
     @Override
     public void handle(Peer sender) {
-        sender.getNode().getNetwork().clear();
-        sender.getNode().getNetwork().addAll(network);
-        System.out.println("Added " + network);
+        sender.getNode().resetNetwork();
+        network.forEach(sender.getNode()::addNodeEntry);
     }
 
     @Override

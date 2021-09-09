@@ -13,7 +13,6 @@ public class WalletTest {
 		var mapper = JsonMapper.mapper;
 		var wallet1 = new Wallet();
 		var json = mapper.writeValueAsString(wallet1);
-		System.out.println(json);
 		var wallet2 = mapper.readValue(json, Wallet.class);
 		assertEquals(wallet1, wallet2);
 	}

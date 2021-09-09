@@ -3,7 +3,7 @@ package mainpackage.server.node;
 import mainpackage.blockchain.Block;
 import mainpackage.server.Server;
 
-import java.util.List;
+import java.util.Set;
 
 public interface INode {
 	void start();
@@ -16,7 +16,13 @@ public interface INode {
 
 	boolean shouldRelayMessages();
 
-	List<NodeEntry> getNetwork();
+	Set<NodeEntry> getNetwork();
+
+	void resetNetwork();
+
+	boolean addNodeEntry(NodeEntry nodeEntry);
+
+	boolean removeNodeEntry(NodeEntry nodeEntry);
 
 	NodeEntry getNodeEntry();
 }

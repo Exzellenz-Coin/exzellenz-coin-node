@@ -18,8 +18,7 @@ public class JoinNetworkMessage extends AbstractMessage {
 
     @Override
     public void handle(Peer sender) {
-        sender.getNode().getNetwork().add(nodeEntry);
-        System.out.println("Added " + nodeEntry);
+        sender.getNode().addNodeEntry(nodeEntry);
     }
 
     @Override

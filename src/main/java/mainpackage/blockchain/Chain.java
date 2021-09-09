@@ -80,9 +80,4 @@ public class Chain {
                 "blockChain=" + blockChain +
                 '}';
     }
-
-    public void printChain() {
-        System.out.println("Blockchain: ");
-        blockChain.forEach(System.out::println);
-    }
 }
