@@ -25,6 +25,7 @@ public class ServerTest {
         node1.start();
         node2.start();
         node3.start();
+        Thread.sleep(10);
         node2.getServer().connectToPeer("localhost", BASE_PORT);
         node3.getServer().connectToPeer("localhost", BASE_PORT + 1);
         Thread.sleep(100);
@@ -52,6 +53,7 @@ public class ServerTest {
         node1.start();
         expectedSet.add(node1.getNodeEntry());
         assertEquals(expectedSet, node1.getNetwork(), "Node 1 does not know the correct network members");
+        Thread.sleep(10);
 
         TestNode node2 = new TestNode(BASE_PORT + 4);
         node2.start();
