@@ -13,7 +13,7 @@ public class BlockTest {
 	public void testTime() {
 		Wallet w1 = new Wallet();
 		Wallet w2 = new Wallet();
-		Transaction transaction1 = new Transaction(w1.getPublicKey(), w2.getPublicKey(), BigDecimal.ONE, new byte[0]);
+		Transaction transaction1 = new Transaction(w1.getPublicKey(), w2.getPublicKey(), BigDecimal.ONE, BigDecimal.ZERO, new byte[0]);
 		long timeBefore = System.currentTimeMillis();
 		Block block = new Block("", Collections.singletonList(transaction1), null, null);
 		long timeAfter = System.currentTimeMillis();

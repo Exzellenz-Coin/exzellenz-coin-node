@@ -28,7 +28,7 @@ public class ChainTest {
 	public void testBlockAddition() {
 		Wallet wallet1 = new Wallet();
 		Wallet wallet2 = new Wallet();
-		Transaction transaction = new Transaction(wallet1.getPublicKey(), wallet2.getPublicKey(), BigDecimal.TEN, new byte[0]);
+		Transaction transaction = new Transaction(wallet1.getPublicKey(), wallet2.getPublicKey(), BigDecimal.TEN, BigDecimal.ZERO, new byte[0]);
 		Block block = new Block(chain.getHead().getHash(), Collections.singletonList(transaction),
 				null, null);
 		chain.addBlock(block);
@@ -40,7 +40,7 @@ public class ChainTest {
 	public void testIllegalBlockAddition() {
 		Wallet wallet1 = new Wallet();
 		Wallet wallet2 = new Wallet();
-		Transaction transaction = new Transaction(wallet1.getPublicKey(), wallet2.getPublicKey(), BigDecimal.ONE, new byte[0]);
+		Transaction transaction = new Transaction(wallet1.getPublicKey(), wallet2.getPublicKey(), BigDecimal.ONE, BigDecimal.ZERO, new byte[0]);
 		Block illegalBlock = new Block("I am an illegal hash :)", Collections.singletonList(transaction),
 				null, null);
 		assertThrows(IllegalArgumentException.class, () -> chain.addBlock(illegalBlock));
@@ -57,7 +57,7 @@ public class ChainTest {
 								Chain.ROOT_WALLET.getPublicKey(),
 								wallet1.getPublicKey(),
 								new BigDecimal("123.456789"),
-								null
+								BigDecimal.ZERO, null
 						)),
 						null,
 						null
@@ -69,7 +69,7 @@ public class ChainTest {
 								wallet1.getPublicKey(),
 								wallet2.getPublicKey(),
 								new BigDecimal("0.123456"),
-								null
+								BigDecimal.ZERO, null
 						)),
 						null,
 						null
@@ -81,7 +81,7 @@ public class ChainTest {
 								Chain.ROOT_WALLET.getPublicKey(),
 								wallet2.getPublicKey(),
 								new BigDecimal(1),
-								null
+								BigDecimal.ZERO, null
 						)),
 						null,
 						null

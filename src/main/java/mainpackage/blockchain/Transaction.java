@@ -9,12 +9,14 @@ public class Transaction {
     private final PublicKey sourceWalletId;
     private final PublicKey targetWalletId;
     private final BigDecimal amount;
-    private byte[] signature;
+    private final BigDecimal tip; //validiators prioritize a higher tip
+    private byte[] signature; //transaction author signature
 
-    public Transaction(PublicKey sourceWalletId, PublicKey targetWalletId, BigDecimal amount, byte[] signature) {
+    public Transaction(PublicKey sourceWalletId, PublicKey targetWalletId, BigDecimal amount, BigDecimal tip, byte[] signature) {
         this.sourceWalletId = sourceWalletId;
         this.targetWalletId = targetWalletId;
         this.amount = amount;
+        this.tip = tip;
         this.signature = signature;
     }
 
@@ -29,6 +31,8 @@ public class Transaction {
     public BigDecimal getAmount() {
         return amount;
     }
+
+    public BigDecimal getTransactionFee() { return tip; }
 
     public byte[] getSignature() {
         return signature;

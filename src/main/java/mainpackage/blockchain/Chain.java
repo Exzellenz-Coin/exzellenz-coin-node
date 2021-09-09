@@ -1,22 +1,27 @@
 package mainpackage.blockchain;
 
+import mainpackage.util.Pair;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
 public class Chain {
-    public static final Wallet ROOT_WALLET = new Wallet(); // MOVE TO SERVER LATER maybe
+    public static final Wallet ROOT_WALLET = new Wallet(); // TODO: change to PublicKey and load from resource folder
     private static final Block START_BLOCK = Block.createGenesisBlock();
+    private static final BigDecimal MIN_STAKE = BigDecimal.valueOf(69); //minimum stake to become a staker
+    private static final BigDecimal PENALTY = BigDecimal.ONE; //penalty for stakers that do not valdiate a block
     private final ArrayList<Block> blockChain;
-    private final ArrayList<PublicKey> validators;
+    private final ArrayList<Pair<PublicKey, BigDecimal>> validators; //public key and stake of VALID stakers
 
     public Chain() {
         blockChain = new ArrayList<>();
+        validators = new ArrayList<>();
         blockChain.add(START_BLOCK); //first entry in the mainpackage.blockchain
-        validators = null;
     }
 
     public void addBlock(final Block block) {
@@ -46,17 +51,26 @@ public class Chain {
         return amount;
     }
 
-    public PublicKey getLeader() {
-        long seed = new BigInteger(blockChain.get(blockChain.size() - 1).getHash().getBytes()).longValue();
-        Random rdm = new Random(seed);
-        return this.validators.get(rdm.nextInt(this.validators.size())); //TODO: select randomly based on the stake
+    public PublicKey getLeader(Block block) {
+        long seed = new BigInteger(block.getHash().getBytes()).longValue();
+        Random rdm = new Random(seed); //randomness based on the most recent accepted block hash
+        BigDecimal sum = validators.stream().map(Pair::two).reduce(BigDecimal.ZERO, BigDecimal::add, BigDecimal::add);
+        List<Pair<PublicKey, BigDecimal>> weights = validators.stream()
+                .map(p -> new Pair<>(p.one(), p.two().divide(sum, RoundingMode.HALF_EVEN))).collect(Collectors.toList());
+        BigDecimal selector = BigDecimal.valueOf(rdm.nextDouble());
+        for (Pair<PublicKey, BigDecimal> pair : weights) {
+            if (pair.two().compareTo(selector) >= 0) {
+                return pair.one();
+            }
+        } // should never happen, but if some calculation errors occur etc
+        return weights.get(weights.size() - 1).one();
     }
 
     public boolean isValidBlock(Block block) {
         Block lastValid = blockChain.get(blockChain.size() - 1);
         if (!lastValid.getHash().equals(block.getPrevHash()) //wrong last hash
                 || !Hash.createHash(block).equals(block.getHash()) //wrong hash
-                || validators.contains(block.getValidator()) //leader is invalid<<<<
+                 //TODO: leader is invalid
         ) {
             return false;
         }
@@ -72,6 +86,10 @@ public class Chain {
             }
         }
         return true;
+    }
+
+    public void findValidators() {
+
     }
 
     @Override
