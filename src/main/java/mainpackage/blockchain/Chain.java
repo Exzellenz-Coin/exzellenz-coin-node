@@ -4,11 +4,13 @@ import mainpackage.util.Pair;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Chain {
     public static final Wallet ROOT_WALLET = new Wallet(); // TODO: change to PublicKey and load from resource folder
