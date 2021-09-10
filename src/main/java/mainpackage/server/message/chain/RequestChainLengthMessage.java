@@ -1,6 +1,7 @@
-package mainpackage.server.message;
+package mainpackage.server.message.chain;
 
 import mainpackage.server.Peer;
+import mainpackage.server.message.AbstractMessage;
 
 import java.io.IOException;
 

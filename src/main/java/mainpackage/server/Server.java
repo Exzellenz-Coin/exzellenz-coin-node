@@ -2,8 +2,8 @@ package mainpackage.server;
 
 import mainpackage.server.message.AbstractMessage;
 import mainpackage.server.message.ConnectMessage;
-import mainpackage.server.message.JoinNetworkMessage;
-import mainpackage.server.message.RequestNetworkMessage;
+import mainpackage.server.message.network.JoinNetworkMessage;
+import mainpackage.server.message.network.RequestNetworkMessage;
 import mainpackage.server.node.INode;
 import mainpackage.server.node.NodeEntry;
 import org.apache.logging.log4j.LogManager;

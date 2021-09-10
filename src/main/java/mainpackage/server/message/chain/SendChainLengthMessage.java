@@ -1,11 +1,11 @@
-package mainpackage.server.message;
+package mainpackage.server.message.chain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import mainpackage.server.Peer;
-import mainpackage.server.node.NodeEntry;
+import mainpackage.server.message.AbstractMessage;
+import mainpackage.server.message.block.RequestBlockMessage;
 
 import java.io.IOException;
-import java.util.Set;
 
 public class SendChainLengthMessage extends AbstractMessage {
     @JsonProperty

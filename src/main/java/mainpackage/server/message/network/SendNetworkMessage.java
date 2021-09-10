@@ -1,7 +1,8 @@
-package mainpackage.server.message;
+package mainpackage.server.message.network;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import mainpackage.server.Peer;
+import mainpackage.server.message.AbstractMessage;
 import mainpackage.server.node.NodeEntry;
 
 import java.util.List;

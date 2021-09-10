@@ -2,7 +2,7 @@ package mainpackage.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import mainpackage.server.message.AbstractMessage;
-import mainpackage.server.message.LeaveNetworkMessage;
+import mainpackage.server.message.network.LeaveNetworkMessage;
 import mainpackage.server.node.INode;
 import mainpackage.server.node.NodeEntry;
 import mainpackage.util.JsonMapper;

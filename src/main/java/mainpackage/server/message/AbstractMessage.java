@@ -6,6 +6,15 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import mainpackage.server.Peer;
+import mainpackage.server.message.block.CreatedBlockMessage;
+import mainpackage.server.message.block.RequestBlockMessage;
+import mainpackage.server.message.block.SendBlockMessage;
+import mainpackage.server.message.chain.RequestChainLengthMessage;
+import mainpackage.server.message.chain.SendChainLengthMessage;
+import mainpackage.server.message.network.JoinNetworkMessage;
+import mainpackage.server.message.network.LeaveNetworkMessage;
+import mainpackage.server.message.network.RequestNetworkMessage;
+import mainpackage.server.message.network.SendNetworkMessage;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

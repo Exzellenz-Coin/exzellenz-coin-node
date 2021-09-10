@@ -1,8 +1,8 @@
-package mainpackage.server.message;
+package mainpackage.server.message.block;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import mainpackage.blockchain.Block;
 import mainpackage.server.Peer;
+import mainpackage.server.message.AbstractMessage;
 
 import java.io.IOException;
 
