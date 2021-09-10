@@ -64,6 +64,7 @@ public class Chain {
             if (pair.two().compareTo(selector) >= 0) {
                 return pair.one();
             }
+            selector = selector.subtract(pair.two);
         } // should never happen, but if some calculation errors occur etc
         return weights.get(weights.size() - 1).one();
     }
