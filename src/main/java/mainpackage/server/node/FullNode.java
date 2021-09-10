@@ -9,6 +9,9 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * An implementation of INode that can perform every possible action.
+ */
 public class FullNode implements INode {
 	protected static final Logger logger = LogManager.getLogger(FullNode.class);
 	protected Server server;

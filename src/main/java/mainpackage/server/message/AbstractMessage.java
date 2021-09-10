@@ -35,7 +35,19 @@ public abstract class AbstractMessage {
         return id;
     }
 
+    /**
+     * This is executed by receiver after the message was received.
+     * Any action that this message should perform should be triggered here.
+     *
+     * @param sender The peer that sent this message
+     */
     public abstract void handle(Peer sender);
 
+    /**
+     * Whether the message should be relayed to all connected nodes.
+     * This method is called after {@link AbstractMessage#handle(Peer)}.
+     *
+     * @return true if the message should be relayed
+     */
     public abstract boolean shouldRelay();
 }
