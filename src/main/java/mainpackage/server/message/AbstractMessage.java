@@ -17,7 +17,12 @@ import mainpackage.server.Peer;
         @JsonSubTypes.Type(name = "join-network", value = JoinNetworkMessage.class),
         @JsonSubTypes.Type(name = "leave-network", value = LeaveNetworkMessage.class),
         @JsonSubTypes.Type(name = "request-network", value = RequestNetworkMessage.class),
-        @JsonSubTypes.Type(name = "send-network", value = SendNetworkMessage.class)
+        @JsonSubTypes.Type(name = "send-network", value = SendNetworkMessage.class),
+        @JsonSubTypes.Type(name = "request-block", value = RequestBlockMessage.class),
+        @JsonSubTypes.Type(name = "send-block", value = SendBlockMessage.class),
+        @JsonSubTypes.Type(name = "request-chain-length", value = RequestChainLengthMessage.class),
+        @JsonSubTypes.Type(name = "send-chain-length", value = SendChainLengthMessage.class),
+        @JsonSubTypes.Type(name = "created-block", value = CreatedBlockMessage.class),
 })
 public abstract class AbstractMessage {
     protected final UUID id;

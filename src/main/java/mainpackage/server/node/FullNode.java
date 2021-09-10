@@ -40,6 +40,7 @@ public class FullNode implements INode {
 		}
 	}
 
+	@Override
 	public boolean shouldRelayMessages() {
 		return true;
 	}
@@ -47,6 +48,11 @@ public class FullNode implements INode {
 	@Override
 	public Set<NodeEntry> getNetwork() {
 		return network;
+	}
+
+	@Override
+	public Chain getBlockChain() {
+		return this.blockChain;
 	}
 
 	@Override
