@@ -4,6 +4,9 @@ import java.util.LinkedHashSet;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
 
+/**
+ * Helper class to model a message cache.
+ */
 public class MessageCache extends LinkedHashSet<UUID> {
 	private final int capacity;
 
