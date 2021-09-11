@@ -1,7 +1,6 @@
 package mainpackage.blockchain;
 
 import mainpackage.blockchain.transaction.Transaction;
-import mainpackage.util.KeyFileLoader;
 
 import java.math.BigDecimal;
 import java.security.PublicKey;

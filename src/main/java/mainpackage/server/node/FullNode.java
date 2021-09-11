@@ -4,9 +4,8 @@ import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
 import mainpackage.server.Server;
 import mainpackage.server.message.block.CreatedBlockMessage;
-import mainpackage.server.message.block.SendBlockMessage;
 import mainpackage.server.message.chain.RequestChainLengthMessage;
-import mainpackage.util.KeyFileLoader;
+import mainpackage.util.KeyHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,8 +27,8 @@ public class FullNode implements INode {
 	private static PrivateKey NODE_PK;
 	static {
 		try {
-			NODE_WALLET = KeyFileLoader.getPublic("node_wallet.der");
-			NODE_PK = KeyFileLoader.getPrivate("node_pk.der");
+			NODE_WALLET = KeyHelper.loadPublicKey("node_wallet.der");
+			NODE_PK = KeyHelper.loadPrivateKey("node_pk.der");
 		} catch (Exception e) {
 			e.printStackTrace();
 			NODE_WALLET = null;

@@ -2,7 +2,7 @@ package mainpackage.blockchain;
 
 import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
-import mainpackage.util.KeyFileLoader;
+import mainpackage.util.KeyHelper;
 import mainpackage.util.Pair;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ public class Chain {
     public static PublicKey FOUNDER_WALLET;
     static {
         try {
-            FOUNDER_WALLET = KeyFileLoader.getPublic("founder_wallet.der");
+            FOUNDER_WALLET = KeyHelper.loadPublicKey("founder_wallet.der");
         } catch (Exception e) {
             e.printStackTrace();
             FOUNDER_WALLET = null;
