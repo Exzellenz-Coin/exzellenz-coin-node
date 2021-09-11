@@ -1,4 +1,4 @@
-package mainpackage.blockchain;
+package mainpackage.blockchain.transaction;
 
 import java.math.BigDecimal;
 import java.security.PublicKey;

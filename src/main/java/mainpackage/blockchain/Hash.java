@@ -1,5 +1,7 @@
 package mainpackage.blockchain;
 
+import mainpackage.blockchain.transaction.Transaction;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 

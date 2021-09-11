@@ -25,12 +25,10 @@ public interface INode {
 	void stop();
 
 	/**
-	 * Defines the logic for mining a block.
-	 * TODO: Is this needed?
+	 * Attempts to validate the NewBlock
 	 *
-	 * @param block The block to mine
 	 */
-	void mineBlock(Block block);
+	boolean validateBlock();
 
 	/**
 	 * Method to get the server that is responsible for connecting to the node network.
@@ -52,8 +50,6 @@ public interface INode {
 	 * @return Set of NodeEntries
 	 */
 	Set<NodeEntry> getNetwork();
-
-	Chain getBlockChain();
 
 	/**
 	 * Resets the set of NodeEntries to only include the NodeEntry of this node.
@@ -85,4 +81,30 @@ public interface INode {
 	 * @return The NodeEntry of this node
 	 */
 	NodeEntry getNodeEntry();
+
+	/**
+	 * Get the Chain of this node.
+	 *
+	 * @return The Chain of this node
+	 */
+	Chain getBlockChain();
+
+	/**
+	 * Get the currently worked on Block of this node.
+	 *
+	 * @return The unofficial Block of this node
+	 */
+	Block getNewBlock();
+
+	/**
+	 * Set the currently worked on Block of this node.
+	 *
+	 */
+	void setNewBlock(Block block);
+
+	/**
+	 * Setup the node
+	 * Updates the node with most recent information from the network
+	 */
+	void update();
 }

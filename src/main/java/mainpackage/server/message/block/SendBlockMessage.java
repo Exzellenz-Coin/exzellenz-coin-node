@@ -7,6 +7,7 @@ import mainpackage.server.message.AbstractMessage;
 import mainpackage.server.message.chain.SendChainLengthMessage;
 
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SendBlockMessage extends AbstractMessage {
     @JsonProperty
@@ -19,8 +20,7 @@ public class SendBlockMessage extends AbstractMessage {
 
     @Override
     public void handle(Peer sender) {
-        if (sender.getNode().getBlockChain().isValidBlock(this.block)) {
-            sender.getNode().getBlockChain().addBlock(this.block);
+        if (sender.getNode().getBlockChain().tryAddBlockSync(this.block)) {
             try {
                 sender.send(new SendChainLengthMessage(sender.getNode().getBlockChain().size())); //requests more blocks if needed
             } catch (IOException e) {

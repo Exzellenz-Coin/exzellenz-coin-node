@@ -1,4 +1,4 @@
-package mainpackage.blockchain;
+package mainpackage.blockchain.transaction;
 
 import mainpackage.util.KeyFileLoader;
 

@@ -3,9 +3,15 @@ package mainpackage.server.node;
 import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
 import mainpackage.server.Server;
+import mainpackage.server.message.block.CreatedBlockMessage;
+import mainpackage.server.message.block.SendBlockMessage;
+import mainpackage.server.message.chain.RequestChainLengthMessage;
+import mainpackage.util.KeyFileLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,12 +23,25 @@ public class FullNode implements INode {
 	protected Server server;
 	protected final Set<NodeEntry> network;
 	protected final Chain blockChain;
+	protected Block newBlock; //add this
+	private static PublicKey NODE_WALLET;
+	private static PrivateKey NODE_PK;
+	static {
+		try {
+			NODE_WALLET = KeyFileLoader.getPublic("node_wallet.der");
+			NODE_PK = KeyFileLoader.getPrivate("node_pk.der");
+		} catch (Exception e) {
+			e.printStackTrace();
+			NODE_WALLET = null;
+			NODE_PK = null;
+		}
+	}
 
 	public FullNode() {
 		this.server = new Server(this);
 		this.network = new HashSet<>();
-		this.blockChain = null; //TODO: load blockchain from storage
-		//TODO: request peer blockchain length, and update if current blockchain is smaller
+		this.blockChain = new Chain(); //TODO: load blockchain from storage
+		this.newBlock = null; //only makes sense to set when blockChain is most recent
 	}
 
 	@Override
@@ -32,15 +51,22 @@ public class FullNode implements INode {
 	}
 
 	@Override
+	public void update() {
+		server.sendToAll(new RequestChainLengthMessage()); //get most recent chain
+	}
+
+	@Override
 	public void stop() {
 		server.shutdown();
 	}
 
 	@Override
-	public void mineBlock(Block block) {
-		if (true) { //TODO: only the current agreed upon highest staker can call this
-			blockChain.addBlock(block);
+	public boolean validateBlock() { //if validator is chosen by the system they can add a block and claim rewards
+		if (blockChain.permittedToValidateNewBlock(NODE_WALLET) && blockChain.tryAddBlockSync(newBlock)) {
+			server.sendToAll(new CreatedBlockMessage(newBlock));
+			return true;
 		}
+		return false;
 	}
 
 	@Override
@@ -88,5 +114,15 @@ public class FullNode implements INode {
 	@Override
 	public Server getServer() {
 		return server;
+	}
+
+	@Override
+	public Block getNewBlock() {
+		return newBlock;
+	}
+
+	@Override
+	public void setNewBlock(Block block) {
+		this.newBlock = block;
 	}
 }
