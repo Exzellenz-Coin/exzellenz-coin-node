@@ -35,7 +35,7 @@ public class ChainTest {
 		Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.TEN, BigDecimal.ZERO, new byte[0]);
 		Block block = new Block(chain.getHead().getHash(), Collections.singletonList(transaction),
 				null, null);
-		chain.addBlock(block);
+		chain.tryAddBlockSync(block);
 		assertEquals(block, chain.getHead(), "A wrong head was set for the mainpackage.blockchain!");
 	}
 
@@ -51,7 +51,6 @@ public class ChainTest {
 	}
 
 	@Test
-	@Disabled //TODO: get rid of wallets
 	@DisplayName("Amount Calculation Test")
 	public void testAmountCalculation() {
 		KeyPair wallet1 = KeyHelper.generateKeyPair();

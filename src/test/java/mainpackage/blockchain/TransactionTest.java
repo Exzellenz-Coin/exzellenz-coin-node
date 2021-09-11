@@ -2,15 +2,23 @@ package mainpackage.blockchain;
 
 import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
+import mainpackage.util.KeyFileLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
 public class TransactionTest {
     @Test
-    @DisplayName("Load Staking PK Test")
-    public void testStakingWallet() {
-        Transaction st = new StakingTransaction(null,null,null,null);
-        Assertions.assertNotNull(StakingTransaction.STAKING_WALLET);
+    @DisplayName("Sign and verify Test")
+    public void testSignVerify() throws Exception {
+        PublicKey founderPublic = KeyFileLoader.getPublic("founder_wallet.der");
+        PrivateKey founderPrivate = KeyFileLoader.getPrivate("founder_pk.der");
+        Transaction t1 = new Transaction(Chain.FOUNDER_WALLET, StakingTransaction.STAKING_WALLET, BigDecimal.ONE, BigDecimal.valueOf(0.1), null);
+        t1.sign(founderPrivate);
+        Assertions.assertTrue(t1.verifySignature(founderPublic));
     }
 }

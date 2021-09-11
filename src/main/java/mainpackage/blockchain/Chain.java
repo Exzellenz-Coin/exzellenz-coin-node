@@ -22,7 +22,6 @@ public class Chain {
             FOUNDER_WALLET = null;
         }
     }
-    private static final Block START_BLOCK = Block.createGenesisBlock();
     private static final BigDecimal INITIAL_REWARD = BigDecimal.valueOf(100);
     private static final BigDecimal MIN_STAKE = BigDecimal.valueOf(69); //minimum stake to become a staker
     private static final BigDecimal PENALTY = BigDecimal.ONE; //penalty for stakers that do not valdiate a block
@@ -34,7 +33,7 @@ public class Chain {
         blockChain = new ArrayList<>();
         validators = new ArrayList<>();
         wallets = new ArrayList<>();
-        addBlock(START_BLOCK); //first entry in the mainpackage.blockchain
+        addBlock(Block.createGenesisBlock()); //first entry in the mainpackage.blockchain
     }
 
     public void addBlock(final Block block) {
@@ -51,7 +50,7 @@ public class Chain {
     }
 
     public boolean permittedToValidateNewBlock(PublicKey validator) {
-        return false; //TODO: overhaul validator selection
+        return true; //TODO: overhaul validator selection
     }
 
     public Block get(int index) { return blockChain.get(index); };
@@ -101,9 +100,10 @@ public class Chain {
         Block lastValid = blockChain.get(blockChain.size() - 1);
         if (!lastValid.getHash().equals(block.getPrevHash()) //wrong last hash
                 || !Hash.createHash(block).equals(block.getHash()) //wrong hash
-                || !getLeaders(lastValid, 1).contains(block.getValidator()) //TODO: overhaul validator selection
-                //TODO: check for valid transactions
+                //|| !getLeaders(lastValid, 1).contains(block.getValidator())
+                //TODO: currently ignores who wrote the block for testing purposes
         ) {
+            //System.out.println(Hash.createHash(block) + " - " + block.getHash() + " - " + block.getHash());
             return false;
         }
         return true;
@@ -200,6 +200,10 @@ public class Chain {
         if (index == -1)
             throw new NoSuchElementException("Could not find block in blockchain");
         return INITIAL_REWARD.divide(BigDecimal.valueOf(index));
+    }
+
+    public boolean isValidTransaction(Transaction transaction) {
+        return true; //TODO: implement
     }
 
     public int size() {

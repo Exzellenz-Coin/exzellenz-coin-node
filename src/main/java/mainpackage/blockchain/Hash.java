@@ -12,14 +12,22 @@ public class Hash {
 		final StringBuilder builder = new StringBuilder();
 		builder.append(block.getPrevHash())
 				.append(DELIMITER)
-				.append(block.getTimeStamp());
+				.append(block.getTimeStamp())
+				.append(DELIMITER)
+				.append(block.getValidator())
+				.append(DELIMITER)
+				.append(block.getSignature());
 		for (final Transaction transaction : block.getTransactions()) {
 			builder.append(DELIMITER)
 					.append(transaction.getSourceWalletId())
 					.append(DELIMITER)
 					.append(transaction.getTargetWalletId())
 					.append(DELIMITER)
-					.append(transaction.getAmount());
+					.append(transaction.getAmount())
+					.append(DELIMITER)
+					.append(transaction.getTransactionFee())
+					.append(DELIMITER)
+					.append(transaction.getSignature());
 		}
 		return applySha256(builder.toString());
 	}
