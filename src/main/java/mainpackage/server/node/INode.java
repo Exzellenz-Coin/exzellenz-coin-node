@@ -2,8 +2,12 @@ package mainpackage.server.node;
 
 import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
+import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.server.Server;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.Set;
 
 /**
@@ -26,9 +30,10 @@ public interface INode {
 
 	/**
 	 * Attempts to validate the NewBlock
-	 *
+	 * @param force If despite not being the validator we still want to attempt andvalidate
+	 * @return If addition and adding was successful
 	 */
-	boolean validateBlock();
+	boolean validateBlock(boolean force);
 
 	/**
 	 * Method to get the server that is responsible for connecting to the node network.
@@ -99,6 +104,7 @@ public interface INode {
 	/**
 	 * Set the currently worked on Block of this node.
 	 *
+	 * @param block To set
 	 */
 	void setNewBlock(Block block);
 
@@ -107,4 +113,18 @@ public interface INode {
 	 * Updates the node with most recent information from the network
 	 */
 	void update();
+
+	/**
+	 * Add a Transaction to list of unpublished transactions
+	 *
+	 * @param transaction The Transaction to add
+	 * @return If the transaction is formatted correctly and was added
+	 */
+	boolean addTransaction(Transaction transaction);
+
+	/**
+	 * Finalize the newBlock for publication
+	 *
+	 */
+	void finalizeBlock() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException;
 }

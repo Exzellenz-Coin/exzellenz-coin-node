@@ -14,7 +14,6 @@ public class KeyFileLoader {
     //ref: https://stackoverflow.com/questions/11410770/load-rsa-public-key-from-file
     public static PrivateKey getPrivate(String name)
             throws Exception {
-
         byte[] keyBytes = KeyFileLoader.class.getClassLoader().getResourceAsStream(name).readAllBytes();
         PKCS8EncodedKeySpec spec =
                 new PKCS8EncodedKeySpec(keyBytes);

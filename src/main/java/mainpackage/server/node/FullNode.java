@@ -2,16 +2,17 @@ package mainpackage.server.node;
 
 import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
+import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.server.Server;
 import mainpackage.server.message.block.CreatedBlockMessage;
-import mainpackage.server.message.block.SendBlockMessage;
 import mainpackage.server.message.chain.RequestChainLengthMessage;
 import mainpackage.util.KeyFileLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,25 +24,26 @@ public class FullNode implements INode {
 	protected Server server;
 	protected final Set<NodeEntry> network;
 	protected final Chain blockChain;
-	protected Block newBlock; //add this
-	private static PublicKey NODE_WALLET;
-	private static PrivateKey NODE_PK;
-	static {
-		try {
-			NODE_WALLET = KeyFileLoader.getPublic("node_wallet.der");
-			NODE_PK = KeyFileLoader.getPrivate("node_pk.der");
-		} catch (Exception e) {
-			e.printStackTrace();
-			NODE_WALLET = null;
-			NODE_PK = null;
-		}
-	}
+	protected Block newBlock;
+	protected ArrayList<Transaction> unofficialTransactions;
+	private PublicKey nodeWallet;
+	private PrivateKey nodePrivateKey;
 
 	public FullNode() {
 		this.server = new Server(this);
 		this.network = new HashSet<>();
-		this.blockChain = new Chain(); //TODO: load blockchain from storage
-		this.newBlock = null; //only makes sense to set when blockChain is most recent
+		this.blockChain = new Chain();
+		//TODO: load blockchain from storage
+		this.unofficialTransactions = new ArrayList<>();
+		this.newBlock = null; //have to set this after you have the newest blockchain
+		try {
+			nodeWallet = KeyFileLoader.getPublic("node_wallet.der");
+			nodePrivateKey = KeyFileLoader.getPrivate("node_pk.der");
+		} catch (Exception e) {
+			e.printStackTrace();
+			nodeWallet = null;
+			nodePrivateKey = null;
+		}
 	}
 
 	@Override
@@ -61,12 +63,35 @@ public class FullNode implements INode {
 	}
 
 	@Override
-	public boolean validateBlock() { //if validator is chosen by the system they can add a block and claim rewards
-		if (blockChain.permittedToValidateNewBlock(NODE_WALLET) && blockChain.tryAddBlockSync(newBlock)) {
+	public boolean validateBlock(boolean force) { //if validator is chosen by the system they can add a block and claim rewards
+		try {
+			finalizeBlock(); //creates and populates a valid newBlock
+		} catch (Exception e) {
+			return false;
+		}
+		if ((force || blockChain.permittedToValidateNewBlock(nodeWallet)) && blockChain.tryAddBlockSync(newBlock)) {
 			server.sendToAll(new CreatedBlockMessage(newBlock));
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void finalizeBlock() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+		//template block
+		newBlock =  new Block(blockChain.getHead().getHash(), new ArrayList<Transaction>(), nodeWallet, null);
+		//sort transactions based on highest tips and add to the block
+		unofficialTransactions.sort(Comparator.comparing(Transaction::getTransactionFee));
+		while (unofficialTransactions.size() != 0 && newBlock.getTransactions().size() != Block.MAX_TRANSACTIONS) {
+			Transaction cur = unofficialTransactions.get(0);
+			if (blockChain.isValidTransaction(cur)) {
+				newBlock.getTransactions().add(cur);
+			}
+			unofficialTransactions.remove(0);
+		}
+		//sign and hash
+		newBlock.sign(nodePrivateKey);
+		newBlock.updateHash();
 	}
 
 	@Override
@@ -112,9 +137,7 @@ public class FullNode implements INode {
 	}
 
 	@Override
-	public Server getServer() {
-		return server;
-	}
+	public Server getServer() { return server; }
 
 	@Override
 	public Block getNewBlock() {
@@ -124,5 +147,14 @@ public class FullNode implements INode {
 	@Override
 	public void setNewBlock(Block block) {
 		this.newBlock = block;
+	}
+
+	@Override
+	public boolean addTransaction(Transaction transaction) {
+		if (Transaction.validValues(transaction) && !unofficialTransactions.contains(transaction)) {
+			unofficialTransactions.add(transaction);
+			return true;
+		}
+		return false;
 	}
 }
