@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  server:
+    build: ./
+    restart: always
+    container_name: "excellence-coin-node"
