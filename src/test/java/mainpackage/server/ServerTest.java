@@ -1,26 +1,21 @@
 package mainpackage.server;
 
-import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
 import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.server.message.HelloWorldMessage;
 import mainpackage.server.node.NodeEntry;
-import mainpackage.util.KeyFileLoader;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import mainpackage.util.KeyHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.SignatureException;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ServerTest {
     private static final int BASE_PORT = 13000;
@@ -106,7 +101,7 @@ public class ServerTest {
         Thread.sleep(100);
 
         //create new block with 1 transaction
-        PrivateKey founderPrivate = KeyFileLoader.getPrivate("founder_pk.der");
+        PrivateKey founderPrivate = KeyHelper.loadPrivateKey("founder_pk.der");
         Transaction t1 = new Transaction(Chain.FOUNDER_WALLET, StakingTransaction.STAKING_WALLET, BigDecimal.ONE, BigDecimal.valueOf(0.1), null);
         t1.sign(founderPrivate);
         assertTrue(node1.addTransaction(t1));
