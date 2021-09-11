@@ -1,12 +1,14 @@
 package mainpackage.blockchain;
 
 import mainpackage.blockchain.transaction.Transaction;
+import mainpackage.util.KeyHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.security.KeyPair;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,9 +30,9 @@ public class ChainTest {
 	@Test
 	@DisplayName("Block Addition Test")
 	public void testBlockAddition() {
-		Wallet wallet1 = new Wallet();
-		Wallet wallet2 = new Wallet();
-		Transaction transaction = new Transaction(wallet1.getPublicKey(), wallet2.getPublicKey(), BigDecimal.TEN, BigDecimal.ZERO, new byte[0]);
+		KeyPair wallet1 = KeyHelper.generateKeyPair();
+		KeyPair wallet2 = KeyHelper.generateKeyPair();
+		Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.TEN, BigDecimal.ZERO, new byte[0]);
 		Block block = new Block(chain.getHead().getHash(), Collections.singletonList(transaction),
 				null, null);
 		chain.addBlock(block);
@@ -40,9 +42,9 @@ public class ChainTest {
 	@Test
 	@DisplayName("Illegal Block Addition Test")
 	public void testIllegalBlockAddition() {
-		Wallet wallet1 = new Wallet();
-		Wallet wallet2 = new Wallet();
-		Transaction transaction = new Transaction(wallet1.getPublicKey(), wallet2.getPublicKey(), BigDecimal.ONE, BigDecimal.ZERO, new byte[0]);
+		KeyPair wallet1 = KeyHelper.generateKeyPair();
+		KeyPair wallet2 = KeyHelper.generateKeyPair();
+		Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.ONE, BigDecimal.ZERO, new byte[0]);
 		Block illegalBlock = new Block("I am an illegal hash :)", Collections.singletonList(transaction),
 				null, null);
 		assertFalse(chain.tryAddBlockSync(illegalBlock));
@@ -52,13 +54,13 @@ public class ChainTest {
 	@Disabled //TODO: get rid of wallets
 	@DisplayName("Amount Calculation Test")
 	public void testAmountCalculation() {
-		Wallet wallet1 = new Wallet();
-		Wallet wallet2 = new Wallet();
+		KeyPair wallet1 = KeyHelper.generateKeyPair();
+		KeyPair wallet2 = KeyHelper.generateKeyPair();
 		chain.addBlock(new Block(
 						chain.getHead().getHash(),
 						Collections.singletonList(new Transaction(
 								Chain.FOUNDER_WALLET,
-								wallet1.getPublicKey(),
+								wallet1.getPublic(),
 								new BigDecimal("123.456789"),
 								BigDecimal.ZERO, null
 						)),
@@ -69,8 +71,8 @@ public class ChainTest {
 		chain.addBlock(new Block(
 						chain.getHead().getHash(),
 						Collections.singletonList(new Transaction(
-								wallet1.getPublicKey(),
-								wallet2.getPublicKey(),
+								wallet1.getPublic(),
+								wallet2.getPublic(),
 								new BigDecimal("0.123456"),
 								BigDecimal.ZERO, null
 						)),
@@ -82,7 +84,7 @@ public class ChainTest {
 						chain.getHead().getHash(),
 						Collections.singletonList(new Transaction(
 								Chain.FOUNDER_WALLET,
-								wallet2.getPublicKey(),
+								wallet2.getPublic(),
 								new BigDecimal(1),
 								BigDecimal.ZERO, null
 						)),
@@ -92,9 +94,9 @@ public class ChainTest {
 		);
 
 		BigDecimal expected1 = new BigDecimal("123.333333");
-		BigDecimal actual1 = chain.getAmount(wallet1);
+		BigDecimal actual1 = chain.getAmount(wallet1.getPublic());
 		BigDecimal expected2 = new BigDecimal("1.123456");
-		BigDecimal actual2 = chain.getAmount(wallet2);
+		BigDecimal actual2 = chain.getAmount(wallet2.getPublic());
 		BigDecimal expected3 = new BigDecimal("-124.456789");
 		//BigDecimal actual3 = chain.getAmount(Chain.FOUNDER_WALLET);
 

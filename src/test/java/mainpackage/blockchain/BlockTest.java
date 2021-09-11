@@ -1,20 +1,22 @@
 package mainpackage.blockchain;
 
 import mainpackage.blockchain.transaction.Transaction;
+import mainpackage.util.KeyHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.security.KeyPair;
 import java.util.Collections;
 
 public class BlockTest {
 	@Test
 	@DisplayName("Time Test")
 	public void testTime() {
-		Wallet w1 = new Wallet();
-		Wallet w2 = new Wallet();
-		Transaction transaction1 = new Transaction(w1.getPublicKey(), w2.getPublicKey(), BigDecimal.ONE, BigDecimal.ZERO, new byte[0]);
+		KeyPair w1 = KeyHelper.generateKeyPair();
+		KeyPair w2 = KeyHelper.generateKeyPair();
+		Transaction transaction1 = new Transaction(w1.getPublic(), w2.getPublic(), BigDecimal.ONE, BigDecimal.ZERO, new byte[0]);
 		long timeBefore = System.currentTimeMillis();
 		Block block = new Block("", Collections.singletonList(transaction1), null, null);
 		long timeAfter = System.currentTimeMillis();

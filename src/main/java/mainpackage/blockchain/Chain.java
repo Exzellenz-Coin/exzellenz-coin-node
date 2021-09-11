@@ -58,16 +58,16 @@ public class Chain {
 
     public Block getHead() { return get(blockChain.size() - 1); } //most recent valid block
 
-    public BigDecimal getAmount(Wallet wallet) {
+    public BigDecimal getAmount(PublicKey wallet) {
         var amount = new BigDecimal(0);
         for (final Block block : blockChain) {
             for (final Transaction transaction : block.getTransactions()) {
                 if (Objects.equals(transaction.getSourceWalletId(), transaction.getTargetWalletId())) {
                     continue;
                 }
-                if (wallet.getPublicKey().equals(transaction.getSourceWalletId())) {
+                if (wallet.equals(transaction.getSourceWalletId())) {
                     amount = amount.subtract(transaction.getAmount());
-                } else if (wallet.getPublicKey().equals(transaction.getTargetWalletId())) {
+                } else if (wallet.equals(transaction.getTargetWalletId())) {
                     amount = amount.add(transaction.getAmount());
                 }
             }
