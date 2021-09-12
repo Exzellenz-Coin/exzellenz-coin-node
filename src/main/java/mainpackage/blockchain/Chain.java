@@ -25,14 +25,14 @@ public class Chain {
     private static final BigDecimal INITIAL_REWARD = BigDecimal.valueOf(100);
     private static final BigDecimal MIN_STAKE = BigDecimal.valueOf(69); //minimum stake to become a staker
     private static final BigDecimal PENALTY = BigDecimal.ONE; //penalty for stakers that do not valdiate a block
-    private final ArrayList<Block> blockChain;
-    private final ArrayList<Pair<PublicKey, BigDecimal>> validators; //public key and stake of VALID stakers
-    private final ArrayList<Pair<PublicKey, BigDecimal>> wallets; //wallets that have received coins and their current balances
+    private final List<Block> blockChain;
+    private final List<Pair<PublicKey, BigDecimal>> validators;  //public key and stake of VALID stakers
+    private final Map<PublicKey, BigDecimal> wallets; //wallets that have received coins and their current balances
 
     public Chain() {
         blockChain = new ArrayList<>();
         validators = new ArrayList<>();
-        wallets = new ArrayList<>();
+        wallets = new HashMap<>();
         addBlock(Block.createGenesisBlock()); //first entry in the mainpackage.blockchain
     }
 
@@ -57,7 +57,11 @@ public class Chain {
 
     public Block getHead() { return get(blockChain.size() - 1); } //most recent valid block
 
-    public BigDecimal getAmount(PublicKey wallet) {
+    public BigDecimal getCachedAmount(PublicKey wallet) {
+        return wallets.get(wallet);
+    }
+
+    public BigDecimal getAmount(PublicKey wallet) { //TODO: make this use the cached values
         var amount = new BigDecimal(0);
         for (final Block block : blockChain) {
             for (final Transaction transaction : block.getTransactions()) {
@@ -153,29 +157,29 @@ public class Chain {
     }
 
     public void updateWallets() {
-        updateWallets(1);
+        updateWallets(0);
     }
 
     public void updateWallets(int beginBlock) throws IndexOutOfBoundsException { //TODO: create tests
-        if (beginBlock <= 0)
+        if (beginBlock < 0)
             throw new IndexOutOfBoundsException("Index must be greater than 0");
         if (beginBlock > this.blockChain.size())
             throw new IndexOutOfBoundsException("Index exceeds length of chain");
         for (int i = beginBlock; i < this.blockChain.size(); i++) {
             Block curBlock = this.blockChain.get(i);
-            ArrayList<Transaction> curTransactions = (ArrayList<Transaction>) curBlock.getTransactions();
+            List<Transaction> curTransactions = curBlock.getTransactions();
             //normal transfers
             curTransactions.stream()
                     .forEach(transaction -> {
-                        //update senders
-                        if (this.wallets.stream().filter(wallet -> wallet.one().equals(transaction.getSourceWalletId())).count() != 0) { //find sender in list if he exists
-                            this.wallets.stream().filter(wallet -> wallet.one().equals(transaction.getSourceWalletId()))
-                                    .forEach(sender -> sender = new Pair<>(sender.one(), sender.two().subtract(transaction.getAmount())));
+                        if (transaction.getSourceWalletId() != null) { //accounts for coinbase transactions
+                            //update senders
+                            if (this.wallets.containsKey(transaction.getSourceWalletId())) { //find sender if he exists
+                                this.wallets.replace(transaction.getSourceWalletId(), this.wallets.get(transaction.getSourceWalletId()).subtract(transaction.getAmount().add(transaction.getTransactionFee())));
+                            }
                         }
                         //update receivers
-                        if (this.wallets.stream().filter(wallet -> wallet.one().equals(transaction.getTargetWalletId())).count() != 0) { //find receiver in list if he exists
-                            this.wallets.stream().filter(wallet -> wallet.one().equals(transaction.getTargetWalletId()))
-                                    .forEach(receiver -> receiver = new Pair<>(receiver.one(), receiver.two().add(transaction.getAmount())));
+                        if (this.wallets.containsKey(transaction.getTargetWalletId())) { //find receiver if he exists
+                            this.wallets.replace(transaction.getSourceWalletId(), this.wallets.get(transaction.getSourceWalletId()).add(transaction.getAmount()));
                         } else { //create new entry
                             this.wallets.add(new Pair<>(transaction.getTargetWalletId(), transaction.getAmount()));
                         }
@@ -183,15 +187,8 @@ public class Chain {
             //validator reward
             PublicKey validatorWallet = curBlock.getValidator();
             //block reward
-            this.wallets.stream().filter(receiver -> receiver.one().equals(validatorWallet))
-                    .forEach(receiver -> receiver = new Pair<>(receiver.one(), receiver.two().add(calculateReward(curBlock))));
-            // tips
-            curTransactions.stream()
-                    .forEach(transaction -> {
-                        //collect tips
-                        this.wallets.stream().filter(wallet -> wallet.one().equals(validatorWallet))
-                                .forEach(receiver -> receiver = new Pair<>(receiver.one(), receiver.two().add(transaction.getTransactionFee())));
-                    });
+            BigDecimal tips = curTransactions.stream().map(Transaction::getTransactionFee).reduce(BigDecimal.ZERO, BigDecimal::add);
+            this.wallets.replace(validatorWallet, this.wallets.get(validatorWallet).add(tips.add(calculateReward(curBlock))));
         }
     }
 
@@ -199,6 +196,8 @@ public class Chain {
         int index = blockChain.indexOf(block);
         if (index == -1)
             throw new NoSuchElementException("Could not find block in blockchain");
+        if (index == 0)
+            return BigDecimal.ZERO;
         return INITIAL_REWARD.divide(BigDecimal.valueOf(index));
     }
 

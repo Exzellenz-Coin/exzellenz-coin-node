@@ -1,5 +1,6 @@
 package mainpackage.blockchain;
 
+import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.util.KeyHelper;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,5 +103,28 @@ public class ChainTest {
 		assertEquals(expected1, actual1, "Amount for wallet 1 was not correctly calculated");
 		assertEquals(expected2, actual2, "Amount for wallet 2 was not correctly calculated");
 		//assertEquals(expected3, actual3, "Amount for root wallet was not correctly calculated");
+	}
+
+	@Test
+	@DisplayName("Update Wallet Test")
+	public void testWalletCache() {
+		chain.updateWallets();
+		assertEquals(BigDecimal.valueOf(100), chain.getCachedAmount(Chain.FOUNDER_WALLET)); //initial funds
+		chain.addBlock(new Block(
+						chain.getHead().getHash(),
+						Collections.singletonList(new Transaction(
+								Chain.FOUNDER_WALLET,
+								StakingTransaction.STAKING_WALLET,
+								new BigDecimal(4),
+								new BigDecimal(1),
+								null
+						)),
+						Chain.FOUNDER_WALLET,
+						null
+				)
+		);
+		chain.updateWallets(1);
+		assertEquals(BigDecimal.valueOf(196), chain.getCachedAmount(Chain.FOUNDER_WALLET)); //initial funds
+		assertEquals(BigDecimal.valueOf(4), chain.getCachedAmount(StakingTransaction.STAKING_WALLET)); //initial funds
 	}
 }

@@ -75,7 +75,7 @@ public class Block implements Signable {
 	}
 
 	public static Block createGenesisBlock() {
-		Block block = new Block("0", Collections.singletonList(new Transaction(null, Chain.FOUNDER_WALLET, BigDecimal.valueOf(100), null, null)), null, null);
+		Block block = new Block("0", Collections.singletonList(new Transaction(null, Chain.FOUNDER_WALLET, BigDecimal.valueOf(100), BigDecimal.ZERO, null)), Chain.FOUNDER_WALLET, null);
 		block.updateHash();
 		return block;
 	}
