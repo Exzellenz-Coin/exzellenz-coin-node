@@ -169,7 +169,7 @@ public class Chain {
             Block curBlock = this.blockChain.get(i);
             List<Transaction> curTransactions = curBlock.getTransactions();
             //normal transfers
-            curTransactions.stream()
+            curTransactions
                     .forEach(transaction -> {
                         if (transaction.getSourceWalletId() != null) { //accounts for coinbase transactions
                             //update senders
@@ -181,7 +181,7 @@ public class Chain {
                         if (this.wallets.containsKey(transaction.getTargetWalletId())) { //find receiver if he exists
                             this.wallets.replace(transaction.getSourceWalletId(), this.wallets.get(transaction.getSourceWalletId()).add(transaction.getAmount()));
                         } else { //create new entry
-                            this.wallets.add(new Pair<>(transaction.getTargetWalletId(), transaction.getAmount()));
+                            wallets.put(transaction.getTargetWalletId(), transaction.getAmount());
                         }
                     });
             //validator reward

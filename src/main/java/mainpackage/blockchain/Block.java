@@ -84,7 +84,7 @@ public class Block implements Signable {
 	public void sign(PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initSign(privateKey);
-		byte[] transactionData = org.bouncycastle.util.Arrays.concatenate(transactions.stream().map(e -> e.toByteArray()).toArray(byte[][]::new));
+		byte[] transactionData = org.bouncycastle.util.Arrays.concatenate(transactions.stream().map(Transaction::toByteArray).toArray(byte[][]::new));
 		byte[] data = org.bouncycastle.util.Arrays.concatenate(prevHash.getBytes(StandardCharsets.UTF_8), BigInteger.valueOf(timeStamp).toByteArray(),transactionData);
 		data = org.bouncycastle.util.Arrays.concatenate(data, validator.getEncoded());
 		signature.update(data);
@@ -95,7 +95,7 @@ public class Block implements Signable {
 	public boolean verifySignature(PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initVerify(publicKey);
-		byte[] transactionData = org.bouncycastle.util.Arrays.concatenate((byte[][]) transactions.stream().map(e -> e.toByteArray()).toArray());
+		byte[] transactionData = org.bouncycastle.util.Arrays.concatenate((byte[][]) transactions.stream().map(Transaction::toByteArray).toArray());
 		byte[] data = org.bouncycastle.util.Arrays.concatenate(prevHash.getBytes(StandardCharsets.UTF_8), BigInteger.valueOf(timeStamp).toByteArray(),transactionData);
 		data = org.bouncycastle.util.Arrays.concatenate(data, validator.getEncoded());
 		signature.update(data);
