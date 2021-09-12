@@ -1,14 +1,15 @@
-package mainpackage.server.message;
+package mainpackage.server.message.chain;
 
 import mainpackage.server.Peer;
+import mainpackage.server.message.AbstractMessage;
 
 import java.io.IOException;
 
-public class RequestNetworkMessage extends AbstractMessage {
+public class RequestChainLengthMessage extends AbstractMessage {
     @Override
     public void handle(Peer sender) {
         try {
-            sender.send(new SendNetworkMessage(sender.getNode().getNetwork()));
+            sender.send(new SendChainLengthMessage(sender.getNode().getBlockChain().size()));
         } catch (IOException e) {
             e.printStackTrace();
         }

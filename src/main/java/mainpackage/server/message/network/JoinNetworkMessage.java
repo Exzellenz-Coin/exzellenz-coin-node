@@ -1,23 +1,25 @@
-package mainpackage.server.message;
+package mainpackage.server.message.network;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import mainpackage.server.Peer;
+import mainpackage.server.message.AbstractMessage;
 import mainpackage.server.node.NodeEntry;
 
-public class LeaveNetworkMessage extends AbstractMessage {
+public class JoinNetworkMessage extends AbstractMessage {
     @JsonProperty
     private NodeEntry nodeEntry;
 
-    private LeaveNetworkMessage() {
+    private JoinNetworkMessage() {
     }
 
-    public LeaveNetworkMessage(NodeEntry nodeEntry) {
+    public JoinNetworkMessage(NodeEntry nodeEntry) {
         this.nodeEntry = nodeEntry;
     }
 
     @Override
     public void handle(Peer sender) {
-        sender.getNode().removeNodeEntry(nodeEntry);
+        sender.getNode().addNodeEntry(nodeEntry);
     }
 
     @Override
