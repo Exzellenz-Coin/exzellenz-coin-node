@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import static org.bouncycastle.util.Arrays.concatenate;
 
@@ -49,7 +50,7 @@ public class Block implements Signable {
     public static Block createGenesisBlock() {
         try {
             var transaction = new Transaction(null, Chain.FOUNDER_WALLET, BigDecimal.valueOf(100), BigDecimal.ZERO);
-            var block = new Block("0", Collections.singletonList(transaction), Chain.FOUNDER_WALLET);
+            var block = new Block(null, Collections.singletonList(transaction), Chain.FOUNDER_WALLET);
             // TODO: Use actual private key
             var privateKey = KeyHelper.generateKeyPair().getPrivate();
             transaction.sign(privateKey);
@@ -107,9 +108,10 @@ public class Block implements Signable {
     public void sign(PrivateKey privateKey) throws InvalidKeyException, SignatureException {
         var sign = KeyHelper.createSignature();
         sign.initSign(privateKey);
-        byte[] transactionData = concatenate(transactions.stream().map(e -> e.toByteArray()).toArray(byte[][]::new));
-        byte[] data = concatenate(prevHash.getBytes(StandardCharsets.UTF_8), BigInteger.valueOf(timeStamp).toByteArray(), transactionData);
-        data = concatenate(data, validator.getEncoded());
+        byte[] transactionData = concatenate(transactions.stream().map(Transaction::toByteArray).toArray(byte[][]::new));
+        byte[] data = concatenate(validator.getEncoded(), BigInteger.valueOf(timeStamp).toByteArray(), transactionData);
+        if(prevHash != null)
+            data = concatenate(data, prevHash.getBytes(StandardCharsets.UTF_8));
         sign.update(data);
         this.signature = sign.sign();
     }
@@ -118,7 +120,7 @@ public class Block implements Signable {
     public boolean verifySignature(PublicKey publicKey) throws InvalidKeyException, SignatureException {
         var sign = KeyHelper.createSignature();
         sign.initVerify(publicKey);
-        byte[] transactionData = concatenate((byte[][]) transactions.stream().map(e -> e.toByteArray()).toArray());
+        byte[] transactionData = concatenate((byte[][]) transactions.stream().map(Transaction::toByteArray).toArray());
         byte[] data = concatenate(prevHash.getBytes(StandardCharsets.UTF_8), BigInteger.valueOf(timeStamp).toByteArray(), transactionData);
         data = concatenate(data, validator.getEncoded());
         sign.update(data);
@@ -128,7 +130,7 @@ public class Block implements Signable {
     @Override
     public String toString() {
         return "Block{" +
-                "prevHash='" + prevHash + '\'' +
+                "prevHash='" + (prevHash == null ? "" : prevHash) + '\'' +
                 ", timeStamp=" + timeStamp +
                 ", transactions=" + transactions +
                 ", validator=" + validator +
