@@ -102,7 +102,7 @@ public class ServerTest {
 
         //create new block with 1 transaction
         PrivateKey founderPrivate = KeyHelper.loadPrivateKey("founder_pk.der");
-        Transaction t1 = new Transaction(Chain.FOUNDER_WALLET, StakingTransaction.STAKING_WALLET, BigDecimal.ONE, BigDecimal.valueOf(0.1), null);
+        Transaction t1 = new Transaction(Chain.FOUNDER_WALLET, StakingTransaction.STAKING_WALLET, BigDecimal.ONE, BigDecimal.valueOf(0.1));
         t1.sign(founderPrivate);
         assertTrue(node1.addTransaction(t1));
         //add to lock blockchain

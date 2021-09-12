@@ -79,7 +79,7 @@ public class FullNode implements INode {
 	@Override
 	public void finalizeBlock() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
 		//template block
-		newBlock =  new Block(blockChain.getHead().getHash(), new ArrayList<Transaction>(), nodeWallet, null);
+		newBlock =  new Block(blockChain.getHead().getHash(), new ArrayList<Transaction>(), nodeWallet);
 		//sort transactions based on highest tips and add to the block
 		unofficialTransactions.sort(Comparator.comparing(Transaction::getTransactionFee));
 		while (unofficialTransactions.size() != 0 && newBlock.getTransactions().size() != Block.MAX_TRANSACTIONS) {
@@ -91,7 +91,7 @@ public class FullNode implements INode {
 		}
 		//sign and hash
 		newBlock.sign(nodePrivateKey);
-		newBlock.updateHash();
+		newBlock.createHash();
 	}
 
 	@Override

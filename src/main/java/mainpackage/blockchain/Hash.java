@@ -16,7 +16,7 @@ public class Hash {
 				.append(DELIMITER)
 				.append(block.getValidator())
 				.append(DELIMITER)
-				.append(block.getSignature());
+				.append(new String(block.getSignature()));
 		for (final Transaction transaction : block.getTransactions()) {
 			builder.append(DELIMITER)
 					.append(transaction.getSourceWalletId())
@@ -27,7 +27,7 @@ public class Hash {
 					.append(DELIMITER)
 					.append(transaction.getTransactionFee())
 					.append(DELIMITER)
-					.append(transaction.getSignature());
+					.append(new String(transaction.getSignature()));
 		}
 		return applySha256(builder.toString());
 	}

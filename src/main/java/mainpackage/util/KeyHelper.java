@@ -3,9 +3,16 @@ package mainpackage.util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.*;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.ECGenParameterSpec;
@@ -28,6 +35,16 @@ public class KeyHelper {
             keyGenerator.initialize(ecSpec, random);   //256 bytes provides an acceptable security level
         } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException e) {
             logger.error("Unable to initialize KeyGenerator", e);
+        }
+    }
+
+    public static Signature createSignature() {
+        try {
+            return Signature.getInstance("SHA512withECDSA");
+        } catch (NoSuchAlgorithmException e) {
+            // This should never happen
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -59,15 +76,21 @@ public class KeyHelper {
         logger.info("Loading private key from file %s".formatted(name));
         byte[] keyBytes = KeyHelper.class.getClassLoader().getResourceAsStream(name).readAllBytes();
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePrivate(spec);
+        return keyFactory.generatePrivate(spec);
     }
 
     public static PublicKey loadPublicKey(String name) throws Exception {
         logger.info("Loading public key from file %s".formatted(name));
         byte[] keyBytes = KeyHelper.class.getClassLoader().getResourceAsStream(name).readAllBytes();
         X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
+        return keyFactory.generatePublic(spec);
+    }
+
+    public static void storeKey(String name, byte[] data) throws Exception {
+        final URL resource = KeyHelper.class.getClassLoader().getResource(name);
+        final FileOutputStream fileOutputStream = new FileOutputStream(new File(resource.toURI()));
+        fileOutputStream.write(data);
+        fileOutputStream.flush();
+        fileOutputStream.close();
     }
 }
