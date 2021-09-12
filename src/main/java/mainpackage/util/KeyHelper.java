@@ -3,15 +3,11 @@ package mainpackage.util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.*;
 import java.security.interfaces.ECPrivateKey;
@@ -21,8 +17,8 @@ import java.security.spec.X509EncodedKeySpec;
 
 public class KeyHelper {
     private static final Logger logger = LogManager.getLogger(KeyHelper.class);
-    private static KeyPairGenerator keyGenerator;
     public static KeyFactory keyFactory;
+    private static KeyPairGenerator keyGenerator;
 
     static {
         Security.addProvider(new BouncyCastleProvider());
