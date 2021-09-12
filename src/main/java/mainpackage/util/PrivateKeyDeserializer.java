@@ -20,6 +20,7 @@ public class PrivateKeyDeserializer extends StdDeserializer<PrivateKey> {
         super(t);
     }
 
+    @Override
     public PrivateKey deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         var spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(p.getValueAsString()));
         try {

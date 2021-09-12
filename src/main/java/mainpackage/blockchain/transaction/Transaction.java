@@ -24,6 +24,14 @@ public class Transaction implements Signable {
         this.tip = tip;
     }
 
+    public Transaction(PublicKey sourceWalletId, PublicKey targetWalletId, BigDecimal amount, BigDecimal tip, byte[] signature) {
+        this.sourceWalletId = sourceWalletId;
+        this.targetWalletId = targetWalletId;
+        this.amount = amount;
+        this.tip = tip;
+        this.signature = signature;
+    }
+
     public static boolean validValues(Transaction transaction) { //looks if this transaction makes sense outside the context of a blockchain
         try {
             if (transaction.getAmount().compareTo(BigDecimal.ZERO) != 1 //amount is not greater than 0
@@ -85,12 +93,11 @@ public class Transaction implements Signable {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final Transaction that = (Transaction) o;
-        return sourceWalletId.equals(that.sourceWalletId) && targetWalletId.equals(that.targetWalletId)
-                && amount.equals(that.amount) && tip.equals(that.tip) && Arrays.equals(signature, that.signature);
+        Transaction that = (Transaction) o;
+        return Objects.equals(sourceWalletId, that.sourceWalletId) && targetWalletId.equals(that.targetWalletId) && amount.equals(that.amount) && tip.equals(that.tip) && Arrays.equals(signature, that.signature);
     }
 
     @Override
