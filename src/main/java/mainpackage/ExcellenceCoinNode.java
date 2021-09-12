@@ -1,12 +1,13 @@
-package mainpackage.server;
+package mainpackage;
 
 import mainpackage.server.node.FullNode;
 import mainpackage.server.node.INode;
+import mainpackage.util.KeyHelper;
+import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
 
 public class ExcellenceCoinNode {
 	/**
 	 * Executing this program requires the following JVM arguments:
-	 * --add-opens java.base/java.math=ALL-UNNAMED
 	 *
 	 * @param args TODO: currently unused
 	 */

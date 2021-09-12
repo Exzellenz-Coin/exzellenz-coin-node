@@ -2,16 +2,14 @@ package mainpackage.util;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
+import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPrivateKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.lang.reflect.Field;
-import java.math.BigInteger;
 import java.net.URL;
 import java.security.*;
-import java.security.interfaces.ECPrivateKey;
-import java.security.spec.ECGenParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -23,20 +21,20 @@ public class KeyHelper {
     static {
         Security.addProvider(new BouncyCastleProvider());
         try {
-            keyFactory = KeyFactory.getInstance("ECDSA", "BC");
-            keyGenerator = KeyPairGenerator.getInstance("ECDSA", "BC");
+            keyFactory = KeyFactory.getInstance("Ed25519", "BC");
+            keyGenerator = KeyPairGenerator.getInstance("Ed25519", "BC");
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
             // Initialize the key generator and generate a KeyPair
-            keyGenerator.initialize(ecSpec, random);   //256 bytes provides an acceptable security level
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException e) {
+            // 256 bytes provides an acceptable security level
+            keyGenerator.initialize(256, random);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             logger.error("Unable to initialize KeyGenerator", e);
         }
     }
 
     public static Signature createSignature() {
         try {
-            return Signature.getInstance("SHA512withECDSA");
+            return Signature.getInstance("Ed25519");
         } catch (NoSuchAlgorithmException e) {
             // This should never happen
             e.printStackTrace();
@@ -49,16 +47,18 @@ public class KeyHelper {
         return keyGenerator.generateKeyPair();
     }
 
-    public static boolean deletePrivateKey(ECPrivateKey privateKey) {
+    public static boolean deletePrivateKey(BCEdDSAPrivateKey privateKey) {
         logger.debug("Wiping a private key");
         try {
-            final BigInteger bigInteger = privateKey.getS();
-            final Field magField = BigInteger.class.getDeclaredField("mag");
-            magField.setAccessible(true);
-            final int[] mag = (int[]) magField.get(bigInteger);
+            final var keyParamsField = BCEdDSAPrivateKey.class.getDeclaredField("eddsaPrivateKey");
+            keyParamsField.setAccessible(true);
+            final var keyParams = (Ed25519PrivateKeyParameters) keyParamsField.get(privateKey);
+            final var dataField = Ed25519PrivateKeyParameters.class.getDeclaredField("data");
+            dataField.setAccessible(true);
+            final var data = (byte[]) dataField.get(keyParams);
             //noinspection ExplicitArrayFilling
-            for (int i = 0; i < mag.length; i++) {
-                mag[i] = 0;
+            for (int i = 0; i < data.length; i++) {
+                data[i] = 0;
             }
             return true;
         } catch (NoSuchFieldException | IllegalAccessException e) {
