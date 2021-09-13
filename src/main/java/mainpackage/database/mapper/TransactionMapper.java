@@ -1,4 +1,4 @@
-package mainpackage.database;
+package mainpackage.database.mapper;
 
 import mainpackage.blockchain.transaction.Transaction;
 import org.jdbi.v3.core.mapper.RowMapper;

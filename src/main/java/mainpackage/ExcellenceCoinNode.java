@@ -1,6 +1,5 @@
 package mainpackage;
 
-import mainpackage.database.DatabasePlayground;
 import mainpackage.server.node.FullNode;
 import mainpackage.server.node.INode;
 
@@ -12,6 +11,7 @@ public class ExcellenceCoinNode {
      */
     public static void main(String[] args) {
         // TODO: Set database configuration
+        // TODO: Update database
         INode node = new FullNode();
         node.start();
 		/*

@@ -1,7 +1,6 @@
 package mainpackage.database;
 
 import mainpackage.blockchain.Block;
-import mainpackage.blockchain.transaction.Transaction;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,16 +9,17 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static mainpackage.database.DatabaseManager.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("SqlResolve")
 public class MapperTest {
-    private static final Jdbi jdbi = DatabasePlayground.databaseConfiguration.getJdbi();
+    private static final Jdbi jdbi = DatabaseManager.databaseConfiguration.getJdbi();
 
     @BeforeEach
     public void initDatabase() {
         jdbi.withHandle(handle -> {
-            DatabasePlayground.createTables(handle);
+            databaseUpdater.update(0);
             return null;
         });
     }
@@ -27,8 +27,7 @@ public class MapperTest {
     @AfterEach
     public void resetDatabase() {
         jdbi.withHandle(handle -> {
-            handle.execute("DROP TABLE transaction");
-            handle.execute("DROP TABLE block");
+            handle.execute("DROP ALL OBJECTS");
             return null;
         });
     }
@@ -39,9 +38,9 @@ public class MapperTest {
         Block block = Block.createGenesisBlock();
         assertThat(block).isNotNull();
         Optional<Block> readBlock = jdbi.withHandle(handle -> {
-            DatabasePlayground.registerMappers(handle);
-            DatabasePlayground.insertBlock(block, handle);
-            return DatabasePlayground.getBlock(block.getHash(), handle);
+            registerMappers(handle);
+            blockDao.insertBlock(block, handle);
+            return blockDao.getBlock(block.getHash(), handle);
         });
         assertThat(readBlock).get().isEqualTo(block);
     }

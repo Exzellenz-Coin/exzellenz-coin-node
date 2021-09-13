@@ -1,4 +1,4 @@
-package mainpackage.database;
+package mainpackage.database.mapper;
 
 import org.jdbi.v3.core.argument.AbstractArgumentFactory;
 import org.jdbi.v3.core.argument.Argument;
@@ -7,8 +7,8 @@ import org.jdbi.v3.core.config.ConfigRegistry;
 import java.security.PublicKey;
 import java.sql.Types;
 
-class PublicKeyArgumentFactory extends AbstractArgumentFactory<PublicKey> {
-    PublicKeyArgumentFactory() {
+public class PublicKeyArgumentFactory extends AbstractArgumentFactory<PublicKey> {
+    public PublicKeyArgumentFactory() {
         super(Types.BINARY);
     }
 
