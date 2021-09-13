@@ -94,7 +94,7 @@
                 <groupId>org.jdbi</groupId>
                 <artifactId>jdbi3-bom</artifactId>
                 <type>pom</type>
-                <version>3.18.0</version>
+                <version>3.21.0</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
