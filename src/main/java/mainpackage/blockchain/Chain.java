@@ -218,7 +218,9 @@ public class Chain {
 	}
 
 	public boolean isValidTransaction(Transaction transaction) {
-		return true; //TODO: implement
+		if (!wallets.containsKey(transaction.getSourceWalletId()))
+			return false;
+		return transaction.getAmount().add(transaction.getTransactionFee()).compareTo(wallets.get(transaction.getSourceWalletId())) != 1;
 	}
 
 	public int size() {
