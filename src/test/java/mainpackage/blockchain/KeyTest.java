@@ -37,10 +37,8 @@ public class KeyTest {
         var wallet = KeyHelper.generateKeyPair();
         var publicKeyJson = mapper.writeValueAsString(wallet.getPublic());
         var privateKeyJson = mapper.writeValueAsString(wallet.getPrivate());
-        assertNotNull(publicKeyJson);
-        assertNotNull(privateKeyJson);
-        assertNotEquals("", publicKeyJson);
-        assertNotEquals("", privateKeyJson);
+        assertThat(publicKeyJson).isNotNull().isNotBlank();
+        assertThat(privateKeyJson).isNotNull().isNotBlank();
         var publicKey = mapper.readValue(publicKeyJson, PublicKey.class);
         var privateKey = mapper.readValue(privateKeyJson, PrivateKey.class);
         assertEquals(wallet.getPublic(), publicKey);

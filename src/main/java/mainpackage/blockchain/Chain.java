@@ -59,8 +59,6 @@ public class Chain {
 		return blockChain.get(index);
 	}
 
-	;
-
 	public Block getHead() {
 		return get(blockChain.size() - 1);
 	} //most recent valid block
