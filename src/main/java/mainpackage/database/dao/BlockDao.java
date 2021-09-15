@@ -19,7 +19,7 @@ public class BlockDao {
     }
 
     private void insertTransaction(Transaction transaction, String blockHash, Handle handle) {
-        handle.createUpdate("INSERT INTO transaction(sourceWalletId, targetWalletId, amount, tip, transactionSignature, blockHash) VALUES (:sourceWalletId, :targetWalletId, :amount, :transactionFee, :signature, :blockHash)")
+        handle.createUpdate("INSERT INTO transaction(sourceWalletId, targetWalletId, amount, tip, data, transactionSignature, blockHash) VALUES (:sourceWalletId, :targetWalletId, :amount, :tip, :data, :signature, :blockHash)")
                 .bindBean(transaction)
                 .bind("blockHash", blockHash)
                 .execute();

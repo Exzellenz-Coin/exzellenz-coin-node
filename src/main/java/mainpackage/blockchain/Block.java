@@ -114,7 +114,7 @@ public class Block implements Signable {
         sign.initSign(privateKey);
         byte[] transactionData = concatenate(transactions.stream().map(Transaction::toByteArray).toArray(byte[][]::new));
         byte[] data = concatenate(validator.getEncoded(), BigInteger.valueOf(timeStamp).toByteArray(), transactionData);
-        if(prevHash != null)
+        if (prevHash != null)
             data = concatenate(data, prevHash.getBytes(StandardCharsets.UTF_8));
         sign.update(data);
         this.signature = sign.sign();
