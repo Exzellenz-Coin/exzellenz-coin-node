@@ -25,7 +25,9 @@ public class Hash {
 					.append(DELIMITER)
 					.append(transaction.getAmount())
 					.append(DELIMITER)
-					.append(transaction.getTransactionFee())
+					.append(transaction.getTip())
+					.append(DELIMITER)
+					.append(transaction.getData())
 					.append(DELIMITER)
 					.append(new String(transaction.getSignature()));
 		}

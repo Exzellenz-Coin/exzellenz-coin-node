@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.SignatureException;
@@ -34,7 +35,7 @@ public class ChainTest {
     public void testBlockAddition() throws SignatureException, InvalidKeyException {
         KeyPair wallet1 = KeyHelper.generateKeyPair();
         KeyPair wallet2 = KeyHelper.generateKeyPair();
-        Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.TEN, BigDecimal.ZERO);
+        Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.TEN, BigDecimal.ZERO, "");
         Block block = new Block(chain.getHead().getHash(), Collections.singletonList(transaction), wallet1.getPublic());
         transaction.sign(wallet1.getPrivate());
         block.sign(wallet1.getPrivate());
@@ -48,7 +49,7 @@ public class ChainTest {
     public void testIllegalBlockAddition() {
         KeyPair wallet1 = KeyHelper.generateKeyPair();
         KeyPair wallet2 = KeyHelper.generateKeyPair();
-        Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.ONE, BigDecimal.ZERO);
+        Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.ONE, BigDecimal.ZERO, "");
         Block illegalBlock = new Block("I am an illegal hash :)", Collections.singletonList(transaction), null);
         assertFalse(chain.tryAddBlockSync(illegalBlock));
     }
@@ -64,7 +65,8 @@ public class ChainTest {
                                 Chain.FOUNDER_WALLET,
                                 wallet1.getPublic(),
                                 new BigDecimal("123.456789"),
-                                BigDecimal.ZERO
+                                BigDecimal.ZERO,
+                                ""
                         )),
                         null
                 )
@@ -75,7 +77,8 @@ public class ChainTest {
                                 wallet1.getPublic(),
                                 wallet2.getPublic(),
                                 new BigDecimal("0.123456"),
-                                BigDecimal.ZERO
+                                BigDecimal.ZERO,
+                                ""
                         )),
                         null
                 )
@@ -86,7 +89,8 @@ public class ChainTest {
                                 Chain.FOUNDER_WALLET,
                                 wallet2.getPublic(),
                                 new BigDecimal(1),
-                                BigDecimal.ZERO
+                                BigDecimal.ZERO,
+                                ""
                         )),
                         null
                 )
@@ -107,7 +111,6 @@ public class ChainTest {
 	@Test
 	@DisplayName("Update Wallet Test")
 	public void testWalletCache() {
-		chain.updateWallets();
 		assertEquals(BigDecimal.valueOf(100), chain.getCachedAmount(Chain.FOUNDER_WALLET)); //initial funds
 		chain.addBlock(new Block(
 						chain.getHead().getHash(),
@@ -115,13 +118,13 @@ public class ChainTest {
 								Chain.FOUNDER_WALLET,
 								StakingTransaction.STAKING_WALLET,
 								new BigDecimal(4),
-								new BigDecimal(1)
-						)),
+								new BigDecimal(1),
+                                ""
+                        )),
 						Chain.FOUNDER_WALLET
 				)
 		);
-		chain.updateWallets(1);
-		assertEquals(BigDecimal.valueOf(196), chain.getCachedAmount(Chain.FOUNDER_WALLET)); //initial funds
+		assertEquals(BigDecimal.valueOf(196).setScale(Transaction.DOWN_ROUNDING_SCALE, RoundingMode.DOWN), chain.getCachedAmount(Chain.FOUNDER_WALLET)); //initial funds
 		assertEquals(BigDecimal.valueOf(4), chain.getCachedAmount(StakingTransaction.STAKING_WALLET)); //initial funds
 	}
 }

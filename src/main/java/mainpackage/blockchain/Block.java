@@ -3,7 +3,6 @@ package mainpackage.blockchain;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.util.KeyHelper;
 
-import java.beans.ConstructorProperties;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 import static org.bouncycastle.util.Arrays.concatenate;
 
@@ -48,19 +46,25 @@ public class Block implements Signable {
     }
 
     public static Block createGenesisBlock() {
-        try {
-            var transaction = new Transaction(null, Chain.FOUNDER_WALLET, BigDecimal.valueOf(100), BigDecimal.ZERO);
-            var block = new Block(null, Collections.singletonList(transaction), Chain.FOUNDER_WALLET);
-            // TODO: Use actual private key
-            var privateKey = KeyHelper.generateKeyPair().getPrivate();
-            transaction.sign(privateKey);
-            block.sign(privateKey);
-            block.createHash();
-            return block;
-        } catch (SignatureException | InvalidKeyException e) {
-            e.printStackTrace();
-            return null;
-        }
+        var transaction = new Transaction(
+                null,
+                Chain.FOUNDER_WALLET,
+                BigDecimal.valueOf(100),
+                BigDecimal.ZERO,
+                "",
+                new byte[] {74, -24, -41, 21, -46, 60, -79, -87, 12, 69, 120, -27, 19, 54, -39, -128, -24, -81, -126, -46, -18, -44, -69, -33, -62, -83, -104, -90, -33, -6, 92, -63, -117, 76, -18, 76, -36, -109, -76, -91, -15, -70, -118, 22, -112, -53, 100, -2, -126, 53, -9, -84, -23, -77, 1, -91, 110, 39, -36, 41, 115, -89, -28, 4});
+        var block = new Block(
+                null,
+                Collections.singletonList(transaction),
+                0,
+                Chain.FOUNDER_WALLET,
+                new byte[] {24, 43, -43, 65, 89, 32, 113, 53, -44, 87, 12, 101, 82, 49, 31, -119, -76, 86, -117, 52, 77, 6, -80, 59, 33, 57, -2, -119, -14, -51, 127, 44, 16, 62, 48, -17, -73, -28, 3, -124, 22, -127, 4, 54, 54, -71, 56, -21, -117, 26, 27, -66, -19, 15, 13, -110, 2, 107, 107, 112, 109, 30, -90, 3},
+                ""
+        );
+        // TODO: Use actual private key
+        var privateKey = KeyHelper.generateKeyPair().getPrivate();
+        block.createHash();
+        return block;
     }
 
     public String getPrevHash() {
@@ -117,14 +121,18 @@ public class Block implements Signable {
     }
 
     @Override
-    public boolean verifySignature(PublicKey publicKey) throws InvalidKeyException, SignatureException {
-        var sign = KeyHelper.createSignature();
-        sign.initVerify(publicKey);
-        byte[] transactionData = concatenate((byte[][]) transactions.stream().map(Transaction::toByteArray).toArray());
-        byte[] data = concatenate(prevHash.getBytes(StandardCharsets.UTF_8), BigInteger.valueOf(timeStamp).toByteArray(), transactionData);
-        data = concatenate(data, validator.getEncoded());
-        sign.update(data);
-        return sign.verify(this.signature);
+    public boolean verifySignature(PublicKey publicKey) {
+        try {
+            var sign = KeyHelper.createSignature();
+            sign.initVerify(publicKey);
+            byte[] transactionData = concatenate((byte[][]) transactions.stream().map(Transaction::toByteArray).toArray());
+            byte[] data = concatenate(prevHash.getBytes(StandardCharsets.UTF_8), BigInteger.valueOf(timeStamp).toByteArray(), transactionData);
+            data = concatenate(data, validator.getEncoded());
+            sign.update(data);
+            return sign.verify(this.signature);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

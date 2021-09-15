@@ -1,5 +1,7 @@
 package mainpackage.server.message;
 
+import java.security.InvalidKeyException;
+import java.security.SignatureException;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;

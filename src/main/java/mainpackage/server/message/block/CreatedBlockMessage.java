@@ -7,6 +7,8 @@ import mainpackage.server.Peer;
 import mainpackage.server.message.AbstractMessage;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.SignatureException;
 
 public class CreatedBlockMessage extends AbstractMessage {
     @JsonIgnore

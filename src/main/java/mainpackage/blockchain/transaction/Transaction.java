@@ -11,31 +11,38 @@ import java.util.Objects;
 import static org.bouncycastle.util.Arrays.concatenate;
 
 public class Transaction implements Signable {
-    private final PublicKey sourceWalletId;
-    private final PublicKey targetWalletId;
-    private final BigDecimal amount;
-    private final BigDecimal tip; //validiators prioritize a higher tip
+    public static int DOWN_ROUNDING_SCALE = 10;
+    private PublicKey sourceWalletId;
+    private PublicKey targetWalletId;
+    private BigDecimal amount;
+    private BigDecimal tip; //validiators prioritize a higher tip
+    private String data;
     private byte[] signature; //transaction author signature
 
-    public Transaction(PublicKey sourceWalletId, PublicKey targetWalletId, BigDecimal amount, BigDecimal tip) {
-        this.sourceWalletId = sourceWalletId;
-        this.targetWalletId = targetWalletId;
-        this.amount = amount;
-        this.tip = tip;
+    private Transaction() {
     }
 
-    public Transaction(PublicKey sourceWalletId, PublicKey targetWalletId, BigDecimal amount, BigDecimal tip, byte[] signature) {
+    public Transaction(PublicKey sourceWalletId, PublicKey targetWalletId, BigDecimal amount, BigDecimal tip, String data) {
         this.sourceWalletId = sourceWalletId;
         this.targetWalletId = targetWalletId;
         this.amount = amount;
         this.tip = tip;
+        this.data = data;
+    }
+
+    public Transaction(PublicKey sourceWalletId, PublicKey targetWalletId, BigDecimal amount, BigDecimal tip, String data, byte[] signature) {
+        this.sourceWalletId = sourceWalletId;
+        this.targetWalletId = targetWalletId;
+        this.amount = amount;
+        this.tip = tip;
+        this.data = data;
         this.signature = signature;
     }
 
     public static boolean validValues(Transaction transaction) { //looks if this transaction makes sense outside the context of a blockchain
         try {
             if (transaction.getAmount().compareTo(BigDecimal.ZERO) != 1 //amount is not greater than 0
-                    || transaction.getTransactionFee().compareTo(BigDecimal.ZERO) == -1 //tip is less than 0
+                    || transaction.getTip().compareTo(BigDecimal.ZERO) == -1 //tip is less than 0
                     || !transaction.verifySignature(transaction.sourceWalletId) //could not verify signature
             ) {
                 return false;
@@ -58,9 +65,11 @@ public class Transaction implements Signable {
         return amount;
     }
 
-    public BigDecimal getTransactionFee() {
+    public BigDecimal getTip() {
         return tip;
     }
+
+    public String getData() { return data; }
 
     @Override
     public void sign(PrivateKey privateKey) throws InvalidKeyException, SignatureException {
@@ -97,7 +106,7 @@ public class Transaction implements Signable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Transaction that = (Transaction) o;
-        return Objects.equals(sourceWalletId, that.sourceWalletId) && targetWalletId.equals(that.targetWalletId) && amount.equals(that.amount) && tip.equals(that.tip) && Arrays.equals(signature, that.signature);
+        return Objects.equals(sourceWalletId, that.sourceWalletId) && targetWalletId.equals(that.targetWalletId) && amount.equals(that.amount) && tip.equals(that.tip) && data.equals(that.data) && Arrays.equals(signature, that.signature);
     }
 
     @Override
@@ -112,6 +121,7 @@ public class Transaction implements Signable {
                 ", targetWalletId=" + targetWalletId +
                 ", amount=" + amount +
                 ", tip=" + tip +
+                ", data=" + data +
                 ", signature=" + Arrays.toString(signature) +
                 '}';
     }
