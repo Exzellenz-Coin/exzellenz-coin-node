@@ -32,7 +32,7 @@ jobs:
                 }
               }
             ]
-          active_profiles: >
+          active_profiles: |
             [
               "myMavenRepoWrite"
             ]
