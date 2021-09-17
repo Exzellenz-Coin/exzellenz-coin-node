@@ -28,7 +28,7 @@ jobs:
               {
                 "id": "myMavenRepoWrite",
                 "properties": {
-                  "myMavenRepoWriteUrl": ${{ secrets.MY_MAVEN_REPO_WRITE_URL }}
+                  "myMavenRepoWriteUrl": "${{ secrets.MY_MAVEN_REPO_WRITE_URL }}"
                 }
               }
             ]
