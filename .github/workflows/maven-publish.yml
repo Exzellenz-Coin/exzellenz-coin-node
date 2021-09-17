@@ -32,6 +32,14 @@ jobs:
                 }
               }
             ]
+          servers: |
+            [
+              {
+                "id": "myMavenRepo",
+                "username": "myMavenRepo",
+                "password": "${{ secrets.MY_MAVEN_REPO_WRITE_PASSWORD }}"
+              }
+            ]
           active_profiles: |
             [
               "myMavenRepoWrite"
