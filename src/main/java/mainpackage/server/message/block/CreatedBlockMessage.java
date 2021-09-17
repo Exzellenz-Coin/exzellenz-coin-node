@@ -7,6 +7,8 @@ import mainpackage.server.Peer;
 import mainpackage.server.message.AbstractMessage;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.SignatureException;
 
 public class CreatedBlockMessage extends AbstractMessage {
     @JsonIgnore
@@ -23,14 +25,10 @@ public class CreatedBlockMessage extends AbstractMessage {
 
     @Override
     public void handle(Peer sender) {
-        if (sender.getNode().getBlockChain().isValidBlock(this.block)) {
+        if (sender.getNode().getBlockChain().isValidBlock(this.block, true)) {
             sender.getNode().getBlockChain().addBlock(this.block);
-            try {
-                this.shouldRelay = true;
-                sender.send(new CreatedBlockMessage(this.block)); //forward message if valid
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            this.shouldRelay = true;
+            //sender.send(new CreatedBlockMessage(this.block)); //forward message if valid
         }
     }
 

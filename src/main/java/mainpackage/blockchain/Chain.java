@@ -41,6 +41,8 @@ public class Chain {
 	public void addBlock(final Block block) {
 		// if (!block.getPrevHash().equals(getHead().getHash())) throw new IllegalArgumentException("Block must have the current head as previous block!");
 		blockChain.add(block);
+		updateWallets(blockChain.size() - 1);
+		updateValidators(blockChain.size() - 1);
 	}
 
 	public synchronized boolean tryAddBlockSync(final Block block) {
@@ -85,6 +87,8 @@ public class Chain {
 	}
 
 	private PublicKey getLeader(Block block, List<Pair<PublicKey, BigDecimal>> validators) {
+		if (validators.size() == 0)
+			return Chain.FOUNDER_WALLET;
 		long seed = new BigInteger(block.getHash().getBytes()).longValue();
 		Random rdm = new Random(seed); //randomness based on the most recent accepted block hash
 		BigDecimal sum = validators.stream().map(Pair::two).reduce(BigDecimal.ZERO, BigDecimal::add, BigDecimal::add);
@@ -115,16 +119,13 @@ public class Chain {
 	}
 
 	public boolean isValidBlock(Block block) {
+		return isValidBlock(block, false);
+	}
+	public boolean isValidBlock(Block block, boolean checkStaker) {
 		Block lastValid = blockChain.get(blockChain.size() - 1);
-		if (!lastValid.getHash().equals(block.getPrevHash()) //wrong last hash
-			|| !Hash.createHash(block).equals(block.getHash()) //wrong hash
-			//|| !getLeaders(lastValid, 1).contains(block.getValidator())
-			//TODO: currently ignores who wrote the block for testing purposes
-		) {
-			//System.out.println(Hash.createHash(block) + " - " + block.getHash() + " - " + block.getHash());
-			return false;
-		}
-		return true;
+		return lastValid.getHash().equals(block.getPrevHash()) //wrong last hash
+				&& Hash.createHash(block).equals(block.getHash()) //wrong hash
+				&& (!checkStaker || getLeader(block, this.validators).equals(block.getValidator()) || !block.verifySignature(block.getValidator()));
 	}
 
 	public boolean isValidChain() {
@@ -151,12 +152,12 @@ public class Chain {
 	}
 
 	public void updateValidators(int beginBlock) throws IndexOutOfBoundsException { //TODO: create tests
-		if (beginBlock <= 0)
+		if (beginBlock < 0)
 			throw new IndexOutOfBoundsException("Index must be greater than 0");
 		if (beginBlock > this.blockChain.size())
 			throw new IndexOutOfBoundsException("Index exceeds length of chain");
 		for (int i = beginBlock; i < this.blockChain.size(); i++) {
-			ArrayList<Transaction> cur = (ArrayList<Transaction>) this.blockChain.get(i).getTransactions();
+			List<Transaction> cur = this.blockChain.get(i).getTransactions();
 			cur.stream()
 					.filter(e -> e.getTargetWalletId().equals(StakingTransaction.STAKING_WALLET)) //only staking transactions
 					.forEach(stakeTransaction -> {
@@ -188,21 +189,25 @@ public class Chain {
 						if (transaction.getSourceWalletId() != null) { //accounts for coinbase transactions
 							//update senders
 							if (this.wallets.containsKey(transaction.getSourceWalletId())) { //find sender if he exists
-								this.wallets.replace(transaction.getSourceWalletId(), this.wallets.get(transaction.getSourceWalletId()).subtract(transaction.getAmount().add(transaction.getTransactionFee())));
+								this.wallets.replace(transaction.getSourceWalletId(), this.wallets.get(transaction.getSourceWalletId()).subtract(transaction.getAmount().add(transaction.getTip())));
 							}
 						}
 						//update receivers
 						if (this.wallets.containsKey(transaction.getTargetWalletId())) { //find receiver if he exists
-							this.wallets.replace(transaction.getSourceWalletId(), this.wallets.get(transaction.getSourceWalletId()).add(transaction.getAmount()));
+							this.wallets.replace(transaction.getTargetWalletId(), this.wallets.get(transaction.getTargetWalletId()).add(transaction.getAmount()));
 						} else { //create new entry
-							wallets.put(transaction.getTargetWalletId(), transaction.getAmount());
+							this.wallets.put(transaction.getTargetWalletId(), transaction.getAmount());
 						}
 					});
 			//validator reward
 			PublicKey validatorWallet = curBlock.getValidator();
 			//block reward
-			BigDecimal tips = curTransactions.stream().map(Transaction::getTransactionFee).reduce(BigDecimal.ZERO, BigDecimal::add);
-			this.wallets.replace(validatorWallet, this.wallets.get(validatorWallet).add(tips.add(calculateReward(curBlock))));
+			BigDecimal tips = curTransactions.stream().map(Transaction::getTip).reduce(BigDecimal.ZERO, BigDecimal::add);
+			if (this.wallets.containsKey(validatorWallet)) {
+				this.wallets.replace(validatorWallet, this.wallets.get(validatorWallet).add(tips.add(calculateReward(curBlock))));
+			} else {
+				this.wallets.put(validatorWallet, tips);
+			}
 		}
 	}
 
@@ -212,13 +217,13 @@ public class Chain {
 			throw new NoSuchElementException("Could not find block in blockchain");
 		if (index == 0)
 			return BigDecimal.ZERO;
-		return INITIAL_REWARD.divide(BigDecimal.valueOf(index));
+		return INITIAL_REWARD.divide(BigDecimal.valueOf(index), Transaction.DOWN_ROUNDING_SCALE, RoundingMode.DOWN);
 	}
 
 	public boolean isValidTransaction(Transaction transaction) {
 		if (!wallets.containsKey(transaction.getSourceWalletId()))
 			return false;
-		return transaction.getAmount().add(transaction.getTransactionFee()).compareTo(wallets.get(transaction.getSourceWalletId())) != 1;
+		return transaction.getAmount().add(transaction.getTip()).compareTo(wallets.get(transaction.getSourceWalletId())) != 1;
 	}
 
 	public int size() {

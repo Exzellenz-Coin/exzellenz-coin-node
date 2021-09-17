@@ -3,7 +3,7 @@ package mainpackage.database.update;
 import mainpackage.database.DatabaseManager;
 import org.jdbi.v3.core.Handle;
 
-@SuppressWarnings("SqlResolve")
+@SuppressWarnings({"SqlResolve", "SqlDialectInspection", "SqlNoDataSourceInspection"})
 public class DatabaseUpdater {
     public static final int VERSION = 1;
 
@@ -35,6 +35,7 @@ public class DatabaseUpdater {
                     targetWalletId bytea not null,
                     amount numeric,
                     tip numeric,
+                    data text,
                     transactionSignature bytea not null,
                     blockHash char(64) not null,
                     foreign key (blockHash) references block(hash)

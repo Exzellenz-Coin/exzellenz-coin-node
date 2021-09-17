@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.SignatureException;
@@ -22,7 +20,7 @@ public class BlockTest {
     public void testTime() {
         KeyPair w1 = KeyHelper.generateKeyPair();
         KeyPair w2 = KeyHelper.generateKeyPair();
-        Transaction transaction1 = new Transaction(w1.getPublic(), w2.getPublic(), BigDecimal.ONE, BigDecimal.ZERO);
+        Transaction transaction1 = new Transaction(w1.getPublic(), w2.getPublic(), BigDecimal.ONE, BigDecimal.ZERO, "");
         long timeBefore = System.currentTimeMillis();
         Block block = new Block("", Collections.singletonList(transaction1), null);
         long timeAfter = System.currentTimeMillis();
@@ -58,7 +56,8 @@ public class BlockTest {
                 Chain.FOUNDER_WALLET,
                 keyPair.getPublic(),
                 new BigDecimal(amount),
-                BigDecimal.ZERO
+                BigDecimal.ZERO,
+                ""
         );
         var block = new Block(
                 headHash,

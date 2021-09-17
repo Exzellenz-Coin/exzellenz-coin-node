@@ -16,7 +16,7 @@ public class StakingTransaction extends Transaction {
         }
     }
 
-    public StakingTransaction(PublicKey sourceWalletId, BigDecimal amount, BigDecimal tip) {
-        super(sourceWalletId, STAKING_WALLET, amount, tip);
+    public StakingTransaction(PublicKey sourceWalletId, BigDecimal amount, BigDecimal tip, String data) {
+        super(sourceWalletId, STAKING_WALLET, amount, tip, data);
     }
 }

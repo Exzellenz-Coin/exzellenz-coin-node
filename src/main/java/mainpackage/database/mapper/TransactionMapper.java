@@ -15,8 +15,8 @@ public class TransactionMapper implements RowMapper<Transaction> {
                 keyMapper.map(rs, "sourceWalletId", ctx),
                 keyMapper.map(rs, "targetWalletId", ctx),
                 rs.getBigDecimal("amount"),
-                rs.getBigDecimal("tip"),
-                rs.getBytes("transactionSignature")
-        );
+                rs.getBigDecimal("tip"), 
+                rs.getString("data"),
+                rs.getBytes("transactionSignature"));
     }
 }

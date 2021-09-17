@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.security.PrivateKey;
 import java.util.HashSet;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -102,10 +103,42 @@ public class ServerTest {
 
         //create new block with 1 transaction
         PrivateKey founderPrivate = KeyHelper.loadPrivateKey("founder_pk.der");
-        Transaction t1 = new Transaction(Chain.FOUNDER_WALLET, StakingTransaction.STAKING_WALLET, BigDecimal.ONE, BigDecimal.valueOf(0.1));
+        Transaction t1 = new Transaction(Chain.FOUNDER_WALLET, StakingTransaction.STAKING_WALLET, BigDecimal.ONE, BigDecimal.valueOf(0.1), "");
         t1.sign(founderPrivate);
         assertTrue(node1.addTransaction(t1));
         //add to lock blockchain
         assertTrue(node1.validateBlock(false));
+        Thread.sleep(100);
+        //test for actual changes
+        assertThat(node1.getBlockChain().size()).isEqualTo(2);
+        assertThat(node1.getBlockChain().getHead().getTransactions()).isNotEmpty().containsExactly(t1);
+        assertThat(node2.getBlockChain().size()).isEqualTo(2);
+        assertThat(node2.getBlockChain().getHead().getTransactions()).isNotEmpty().containsExactly(t1);
+        assertThat(node3.getBlockChain().size()).isEqualTo(2);
+        assertThat(node3.getBlockChain().getHead().getTransactions()).isNotEmpty().containsExactly(t1);
     }
+
+    @Test
+    @DisplayName("Full Test")
+    public void fullTest() throws IOException, InterruptedException {
+        // Create 3 nodes and connect the servers
+        TestNode node1 = new TestNode(BASE_PORT + 9);
+        node1.start();
+        Thread.sleep(10);
+
+        TestNode node2 = new TestNode(BASE_PORT + 10);
+        node2.start();
+        node2.getServer().connectToPeer("localhost", BASE_PORT + 9);
+        node2.getServer().doInitialConnect();
+        Thread.sleep(100);
+
+        TestNode node3 = new TestNode(BASE_PORT + 11);
+        node3.start();
+        node3.getServer().connectToPeer("localhost", BASE_PORT + 10);
+        node3.getServer().doInitialConnect();
+        Thread.sleep(100);
+
+
+    }
+
 }

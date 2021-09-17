@@ -81,7 +81,7 @@ public class FullNode implements INode {
 		//template block
 		newBlock =  new Block(blockChain.getHead().getHash(), new ArrayList<Transaction>(), nodeWallet);
 		//sort transactions based on highest tips and add to the block
-		unofficialTransactions.sort(Comparator.comparing(Transaction::getTransactionFee));
+		unofficialTransactions.sort(Comparator.comparing(Transaction::getTip));
 		while (unofficialTransactions.size() != 0 && newBlock.getTransactions().size() != Block.MAX_TRANSACTIONS) {
 			Transaction cur = unofficialTransactions.get(0);
 			if (blockChain.isValidTransaction(cur)) {
