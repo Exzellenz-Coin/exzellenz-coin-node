@@ -140,4 +140,9 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>myMavenRepoWrite</id>
+        </repository>
+    </distributionManagement>
 </project>
