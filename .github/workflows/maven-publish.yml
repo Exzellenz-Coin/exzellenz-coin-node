@@ -35,7 +35,7 @@ jobs:
           servers: |
             [
               {
-                "id": "myMavenRepo",
+                "id": "myMavenRepoWrite",
                 "username": "myMavenRepo",
                 "password": "${{ secrets.MY_MAVEN_REPO_WRITE_PASSWORD }}"
               }
