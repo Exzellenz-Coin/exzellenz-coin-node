@@ -143,6 +143,8 @@
     <distributionManagement>
         <repository>
             <id>myMavenRepoWrite</id>
+            <!--suppress UnresolvedMavenProperty -->
+            <url>${myMavenRepoWriteUrl}</url>
         </repository>
     </distributionManagement>
 </project>

@@ -23,16 +23,18 @@ jobs:
       - name: Generate settings.xml
         uses: whelk-io/maven-settings-xml-action@v18
         with:
-          repositories: |
+          profiles: |
             [
               {
                 "id": "myMavenRepoWrite",
-                "name": "My Maven Repo",
-                "url": "${{ secrets.MY_MAVEN_REPO_WRITE_URL }}",
-                "releases": {
-                  "enabled": "true"
+                "properties": {
+                  "myMavenRepoWriteUrl": ${{ secrets.MY_MAVEN_REPO_WRITE_URL }}
                 }
               }
+            ]
+          active_profiles: >
+            [
+              "myMavenRepoWrite"
             ]
 
       - name: Deploy with Maven
