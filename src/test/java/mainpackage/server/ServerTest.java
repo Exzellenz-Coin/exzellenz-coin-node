@@ -6,6 +6,7 @@ import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.server.message.HelloWorldMessage;
 import mainpackage.server.node.NodeEntry;
 import mainpackage.util.KeyHelper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -119,6 +120,7 @@ public class ServerTest {
     }
 
     @Test
+    @Disabled //TODO: this will be added when we are nearly done
     @DisplayName("Full Test")
     public void fullTest() throws IOException, InterruptedException {
         // Create 3 nodes and connect the servers
@@ -137,8 +139,6 @@ public class ServerTest {
         node3.getServer().connectToPeer("localhost", BASE_PORT + 10);
         node3.getServer().doInitialConnect();
         Thread.sleep(100);
-
-
     }
 
 }

@@ -1,6 +1,7 @@
 package mainpackage.blockchain;
 
 import mainpackage.blockchain.transaction.Transaction;
+import mainpackage.util.Trees.MerkelNode;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -34,7 +35,16 @@ public class Hash {
 		return applySha256(builder.toString());
 	}
 
-	private static String applySha256(String input) {
+	public static String createHash(Transaction transaction) {
+		//System.out.println("hash: " + applySha256(new String(transaction.toByteArray())));
+		return applySha256(new String(transaction.toByteArray()));
+	}
+
+	public static String createHash(MerkelNode nodeLeft, MerkelNode nodeRight) {
+		return applySha256(nodeLeft.getHash() + nodeRight.getHash());
+	}
+
+	public static String applySha256(String input) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));

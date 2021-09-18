@@ -23,6 +23,7 @@ public class Block implements Signable {
     private List<Transaction> transactions;
     private long timeStamp;
     private PublicKey validator; //rewards sent here
+    private String merkelRoot; //TODO: change list of transactions to merkel tree
     private byte[] signature; //staker signature
     private String hash; //hash of this block
 
