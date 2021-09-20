@@ -3,6 +3,7 @@ COPY pom.xml /tmp/
 COPY src /tmp/src/
 WORKDIR /tmp/
 RUN mvn -T 4C install
+RUN rm /tmp/target/ExcellenceCoinNode-*-sources.jar
 
 FROM openjdk:16-alpine
 WORKDIR /app
