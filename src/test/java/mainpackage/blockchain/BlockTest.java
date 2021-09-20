@@ -22,7 +22,7 @@ public class BlockTest {
         KeyPair w2 = KeyHelper.generateKeyPair();
         Transaction transaction1 = new Transaction(w1.getPublic(), w2.getPublic(), BigDecimal.ONE, BigDecimal.ZERO, "");
         long timeBefore = System.currentTimeMillis();
-        Block block = new Block("", Collections.singletonList(transaction1), null);
+        Block block = new Block( "", 0, Collections.singletonList(transaction1), null);
         long timeAfter = System.currentTimeMillis();
         Assertions.assertTrue(timeBefore <= block.getTimeStamp(),
                 "Time in the past was set to the block!");
@@ -33,7 +33,7 @@ public class BlockTest {
     @Test
     @DisplayName("Signature Test")
     public void signatureTest() throws SignatureException, InvalidKeyException {
-        var block = createBlock(new Chain().getHead().getHash(), KeyHelper.generateKeyPair(), "1");
+        var block = createBlock(new Chain().getHead().getHash(), 0, KeyHelper.generateKeyPair(), "1");
         assertNotNull(block.getSignature(), "Signature is null");
         assertNotEquals(0, block.getSignature().length, "Signature array is empty");
     }
@@ -43,15 +43,15 @@ public class BlockTest {
     public void hashTest() throws InvalidKeyException, SignatureException {
         var chain = new Chain();
         var keyPair = KeyHelper.generateKeyPair();
-        var block1 = createBlock(chain.getHead().getHash(), keyPair, "123.456789");
-        var block3 = createBlock(chain.getHead().getHash(), keyPair, "1");
+        var block1 = createBlock(chain.getHead().getHash(), 0, keyPair, "123.456789");
+        var block3 = createBlock(chain.getHead().getHash(), 1, keyPair, "1");
 
         assertNotEquals(block1.getHash(), block3.getHash(), "Hash collision: hash function broken");
         assertEquals(64, block1.getHash().length(), "Hash has an incorrect length");
         assertEquals(64, block3.getHash().length(), "Hash has an incorrect length");
     }
 
-    private Block createBlock(String headHash, KeyPair keyPair, String amount) throws SignatureException, InvalidKeyException {
+    private Block createBlock(String headHash, long blockNumber, KeyPair keyPair, String amount) throws SignatureException, InvalidKeyException {
         var transaction = new Transaction(
                 Chain.FOUNDER_WALLET,
                 keyPair.getPublic(),
@@ -61,6 +61,7 @@ public class BlockTest {
         );
         var block = new Block(
                 headHash,
+                blockNumber,
                 Collections.singletonList(transaction),
                 keyPair.getPublic()
         );

@@ -2,6 +2,7 @@ package mainpackage.server.node;
 
 import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
+import mainpackage.blockchain.staking.StakeKeys;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.server.Server;
 import mainpackage.server.message.block.CreatedBlockMessage;
@@ -26,6 +27,7 @@ public class FullNode implements INode {
 	protected final Chain blockChain;
 	protected Block newBlock;
 	protected ArrayList<Transaction> unofficialTransactions;
+	private StakeKeys stakeKeys;
 	private PublicKey nodeWallet;
 	private PrivateKey nodePrivateKey;
 
@@ -36,6 +38,7 @@ public class FullNode implements INode {
 		//TODO: load blockchain from storage
 		this.unofficialTransactions = new ArrayList<>();
 		this.newBlock = null; //have to set this after you have the newest blockchain
+		this.stakeKeys = null; //have to set this after you first stake
 		try {
 			nodeWallet = KeyHelper.loadPublicKey("node_wallet.der");
 			nodePrivateKey = KeyHelper.loadPrivateKey("node_pk.der");
@@ -79,7 +82,7 @@ public class FullNode implements INode {
 	@Override
 	public void finalizeBlock() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
 		//template block
-		newBlock =  new Block(blockChain.getHead().getHash(), new ArrayList<Transaction>(), nodeWallet);
+		newBlock =  new Block(blockChain.getHead().getHash(), blockChain.getHead().getBlockNumber() + 1, new ArrayList<Transaction>(), nodeWallet);
 		//sort transactions based on highest tips and add to the block
 		unofficialTransactions.sort(Comparator.comparing(Transaction::getTip));
 		while (unofficialTransactions.size() != 0 && newBlock.getTransactions().size() != Block.MAX_TRANSACTIONS) {

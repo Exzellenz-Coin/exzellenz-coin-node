@@ -36,7 +36,7 @@ public class ChainTest {
         KeyPair wallet1 = KeyHelper.generateKeyPair();
         KeyPair wallet2 = KeyHelper.generateKeyPair();
         Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.TEN, BigDecimal.ZERO, "");
-        Block block = new Block(chain.getHead().getHash(), Collections.singletonList(transaction), wallet1.getPublic());
+        Block block = new Block(chain.getHead().getHash(), 0, Collections.singletonList(transaction), wallet1.getPublic());
         transaction.sign(wallet1.getPrivate());
         block.sign(wallet1.getPrivate());
         block.createHash();
@@ -50,7 +50,7 @@ public class ChainTest {
         KeyPair wallet1 = KeyHelper.generateKeyPair();
         KeyPair wallet2 = KeyHelper.generateKeyPair();
         Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.ONE, BigDecimal.ZERO, "");
-        Block illegalBlock = new Block("I am an illegal hash :)", Collections.singletonList(transaction), null);
+        Block illegalBlock = new Block("I am an illegal hash :)", 0, Collections.singletonList(transaction), null);
         assertFalse(chain.tryAddBlockSync(illegalBlock));
     }
 
@@ -61,6 +61,7 @@ public class ChainTest {
         KeyPair wallet2 = KeyHelper.generateKeyPair();
         chain.addBlock(new Block(
                         chain.getHead().getHash(),
+                        0,
                         Collections.singletonList(new Transaction(
                                 Chain.FOUNDER_WALLET,
                                 wallet1.getPublic(),
@@ -73,6 +74,7 @@ public class ChainTest {
         );
         chain.addBlock(new Block(
                         chain.getHead().getHash(),
+                         0,
                         Collections.singletonList(new Transaction(
                                 wallet1.getPublic(),
                                 wallet2.getPublic(),
@@ -85,6 +87,7 @@ public class ChainTest {
         );
         chain.addBlock(new Block(
                         chain.getHead().getHash(),
+                         0,
                         Collections.singletonList(new Transaction(
                                 Chain.FOUNDER_WALLET,
                                 wallet2.getPublic(),
@@ -114,6 +117,7 @@ public class ChainTest {
 		assertEquals(BigDecimal.valueOf(100), chain.getCachedAmount(Chain.FOUNDER_WALLET)); //initial funds
 		chain.addBlock(new Block(
 						chain.getHead().getHash(),
+                        0,
 						Collections.singletonList(new Transaction(
 								Chain.FOUNDER_WALLET,
 								StakingTransaction.STAKING_WALLET,

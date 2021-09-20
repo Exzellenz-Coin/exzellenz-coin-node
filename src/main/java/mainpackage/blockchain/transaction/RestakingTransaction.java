@@ -5,7 +5,7 @@ import mainpackage.util.KeyHelper;
 import java.math.BigDecimal;
 import java.security.PublicKey;
 
-public class StakingTransaction extends Transaction {
+public class RestakingTransaction extends Transaction {
     public static PublicKey STAKING_WALLET; //locked wallet
     static {
         try {
@@ -16,7 +16,7 @@ public class StakingTransaction extends Transaction {
         }
     }
 
-    public StakingTransaction(PublicKey sourceWalletId, BigDecimal amount, BigDecimal tip, byte[] signature) {
+    public RestakingTransaction(PublicKey sourceWalletId, BigDecimal amount, BigDecimal tip, byte[] signature) {
         super(sourceWalletId, STAKING_WALLET, amount, tip, "STAKE", signature);
     }
 }

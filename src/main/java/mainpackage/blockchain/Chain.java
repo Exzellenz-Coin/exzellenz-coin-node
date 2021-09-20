@@ -1,14 +1,18 @@
 package mainpackage.blockchain;
 
+import mainpackage.blockchain.staking.StakerIdentity;
 import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.util.KeyHelper;
 import mainpackage.util.Pair;
+import mainpackage.util.TransactionDataParser;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.security.InvalidKeyException;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,7 +32,8 @@ public class Chain {
 	private static final BigDecimal MIN_STAKE = BigDecimal.valueOf(69); //minimum stake to become a staker
 	private static final BigDecimal PENALTY = BigDecimal.ONE; //penalty for stakers that do not valdiate a block
 	private final List<Block> blockChain;
-	private final List<Pair<PublicKey, BigDecimal>> validators;  //public key and stake of VALID stakers
+	//private final List<Pair<PublicKey, BigDecimal>> validators;  //public key and stake of VALID stakers
+	private final List<StakerIdentity> validators;
 	private final Map<PublicKey, BigDecimal> wallets; //wallets that have received coins and their current balances
 
 	public Chain() {
@@ -106,7 +111,7 @@ public class Chain {
 	public ArrayList<PublicKey> getLeaders(Block block, int depth) {
 		if (depth <= 0)
 			throw new IndexOutOfBoundsException("Index must be greater than 0");
-		Map<PublicKey, BigDecimal> mapping = validators.stream().collect(Collectors.toMap(Pair::one, Pair::two));
+		Map<PublicKey, BigDecimal> mapping = validators.stream().collect(Collectors.toMap(StakerIdentity::getPublicKey, StakerIdentity::getStake)); //todo: check this, i changed it
 		ArrayList<PublicKey> result = new ArrayList<>();
 		for (int i = 0; i < depth; i++) {
 			List<Pair<PublicKey, BigDecimal>> temp = mapping.entrySet().stream()
@@ -125,7 +130,7 @@ public class Chain {
 		Block lastValid = blockChain.get(blockChain.size() - 1);
 		return lastValid.getHash().equals(block.getPrevHash()) //wrong last hash
 				&& Hash.createHash(block).equals(block.getHash()) //wrong hash
-				&& (!checkStaker || getLeader(block, this.validators).equals(block.getValidator()) || !block.verifySignature(block.getValidator()));
+				&& (!checkStaker || !block.verifySignature(block.getValidator())); //TODO: add signature check
 	}
 
 	public boolean isValidChain() {
@@ -161,11 +166,17 @@ public class Chain {
 			cur.stream()
 					.filter(e -> e.getTargetWalletId().equals(StakingTransaction.STAKING_WALLET)) //only staking transactions
 					.forEach(stakeTransaction -> {
-						if (this.validators.stream().filter(validator -> validator.one().equals(stakeTransaction.getSourceWalletId())).count() != 0) { //find staker in list if he exists
-							this.validators.stream().filter(validator -> validator.one().equals(stakeTransaction.getSourceWalletId()))
-									.forEach(validator -> validator = new Pair<>(validator.one(), validator.two().add(stakeTransaction.getAmount())));
+						if (this.validators.stream().filter(validator -> validator.getPublicKey().equals(stakeTransaction.getSourceWalletId())).count() != 0) { //find staker in list if he exists
+							this.validators.stream().filter(validator -> validator.getPublicKey().equals(stakeTransaction.getSourceWalletId()))
+									.forEach(validator -> validator.setStake(validator.getStake().add(stakeTransaction.getAmount())));
 						} else { //create new entry
-							this.validators.add(new Pair<>(stakeTransaction.getSourceWalletId(), stakeTransaction.getAmount()));
+							try {
+								this.validators.add(new StakerIdentity(stakeTransaction.getSourceWalletId(), TransactionDataParser.parsePublicPairs(stakeTransaction.getData()), stakeTransaction.getAmount())); //todo: add the transactions from the message
+							} catch (SignatureException e) {
+								e.printStackTrace();
+							} catch (InvalidKeyException e) {
+								e.printStackTrace();
+							}
 						}
 					});
 		}
@@ -175,7 +186,7 @@ public class Chain {
 		updateWallets(0);
 	}
 
-	public void updateWallets(int beginBlock) throws IndexOutOfBoundsException { //TODO: create tests
+	public void updateWallets(int beginBlock) throws IndexOutOfBoundsException {
 		if (beginBlock < 0)
 			throw new IndexOutOfBoundsException("Index must be greater than 0");
 		if (beginBlock > this.blockChain.size())

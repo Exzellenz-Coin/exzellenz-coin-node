@@ -14,6 +14,7 @@ public class BlockMapper implements RowMapper<Block> {
         final PublicKeyColumnMapper keyMapper = new PublicKeyColumnMapper();
         return new Block(
                 rs.getString("prevHash"),
+                rs.getLong("blockNumber"),
                 new ArrayList<>(),
                 rs.getLong("timeStamp"),
                 keyMapper.map(rs, "validator", ctx),
