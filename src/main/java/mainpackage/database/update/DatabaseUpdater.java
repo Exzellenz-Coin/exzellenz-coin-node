@@ -21,6 +21,7 @@ public class DatabaseUpdater {
                 CREATE TABLE IF NOT EXISTS block (
                     hash char(64) not null,
                     prevHash char(64),
+                    blockNumber int8,
                     timeStamp int8,
                     validator bytea not null,
                     blockSignature bytea not null,

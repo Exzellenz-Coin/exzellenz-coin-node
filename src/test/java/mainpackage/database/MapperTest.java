@@ -30,7 +30,6 @@ public class MapperTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("Block Mapper Test")
     public void blockMapperTest() {
         Block block = Block.createGenesisBlock();
