@@ -1,5 +1,6 @@
 package mainpackage.util;
 
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -10,17 +11,15 @@ public class JsonMapper {
     public static final ObjectMapper mapper = new ObjectMapper();
 
     static {
+        mapper.registerModule(getModule());
+    }
+
+    public static Module getModule() {
         SimpleModule module = new SimpleModule();
-        /*
-        module.addSerializer(PublicKey.class, new KeySerializer2());
-        module.addSerializer(PrivateKey.class, new KeySerializer2());
-        module.addDeserializer(PublicKey.class, new KeyDeserializer2<>());
-        module.addDeserializer(PrivateKey.class, new KeyDeserializer2<>());
-         */
         module.addSerializer(PublicKey.class, new KeySerializer());
         module.addSerializer(PrivateKey.class, new KeySerializer());
         module.addDeserializer(PublicKey.class, new PublicKeyDeserializer());
         module.addDeserializer(PrivateKey.class, new PrivateKeyDeserializer());
-        mapper.registerModule(module);
+        return module;
     }
 }

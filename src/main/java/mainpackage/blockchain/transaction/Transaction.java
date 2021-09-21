@@ -119,9 +119,8 @@ public class Transaction implements Signable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Transaction that = (Transaction) o;
-        return Objects.equals(sourceWalletId, that.sourceWalletId) && targetWalletId.equals(that.targetWalletId) && amount.equals(that.amount) && tip.equals(that.tip) && data.equals(that.data) && Arrays.equals(signature, that.signature);
+        if (!(o instanceof Transaction that)) return false;
+        return Objects.equals(sourceWalletId, that.sourceWalletId) && Objects.equals(targetWalletId, that.targetWalletId) && Objects.equals(amount, that.amount) && Objects.equals(tip, that.tip) && Objects.equals(data, that.data) && Arrays.equals(signature, that.signature);
     }
 
     @Override
@@ -136,7 +135,7 @@ public class Transaction implements Signable {
                 ", targetWalletId=" + targetWalletId +
                 ", amount=" + amount +
                 ", tip=" + tip +
-                ", data=" + data +
+                ", data='" + data + '\'' +
                 ", signature=" + Arrays.toString(signature) +
                 '}';
     }

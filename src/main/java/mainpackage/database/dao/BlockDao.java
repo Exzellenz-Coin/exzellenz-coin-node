@@ -10,7 +10,7 @@ import java.util.Optional;
 @SuppressWarnings("SqlResolve")
 public class BlockDao {
     public void insertBlock(Block block, Handle handle) {
-        handle.createUpdate("INSERT INTO block(hash, prevHash, timeStamp, validator, blockSignature) VALUES (:hash, :prevHash, :timeStamp, :validator, :signature)")
+        handle.createUpdate("INSERT INTO block(hash, prevHash, blockNumber, timeStamp, validator, blockSignature) VALUES (:hash, :prevHash, :blockNumber, :timeStamp, :validator, :signature)")
                 .bindBean(block)
                 .execute();
         for (Transaction transaction : block.getTransactions()) {

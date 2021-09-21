@@ -164,9 +164,11 @@ public class Block implements Signable {
     @Override
     public String toString() {
         return "Block{" +
-                "prevHash='" + (prevHash == null ? "" : prevHash) + '\'' +
-                ", timeStamp=" + timeStamp +
+                "prevHash='" + prevHash + '\'' +
+                ", blockNumber=" + blockNumber +
                 ", transactions=" + transactions +
+                ", timeStamp=" + timeStamp +
+                ", merkelRoot='" + merkelRoot + '\'' +
                 ", validator=" + validator +
                 ", signature=" + Arrays.toString(signature) +
                 ", hash='" + hash + '\'' +
