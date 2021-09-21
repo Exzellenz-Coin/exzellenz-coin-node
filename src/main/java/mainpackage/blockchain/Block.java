@@ -11,10 +11,7 @@ import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.bouncycastle.util.Arrays.concatenate;
 
@@ -56,6 +53,7 @@ public class Block implements Signable {
         this.merkelRoot = merkelRoot;
         this.validator = validator;
         this.timeStamp = System.currentTimeMillis();
+        this.transactions = new ArrayList<>();
     }
 
     public Block(String prevHash, long blockNumber, String merkelRoot, long timeStamp, PublicKey validator, byte[] signature, String hash) {
@@ -66,6 +64,7 @@ public class Block implements Signable {
         this.validator = validator;
         this.signature = signature;
         this.hash = hash;
+        this.transactions = new ArrayList<>();
     }
 
     public static Block createGenesisBlock() {

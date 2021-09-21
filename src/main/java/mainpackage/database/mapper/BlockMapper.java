@@ -15,7 +15,7 @@ public class BlockMapper implements RowMapper<Block> {
         return new Block(
                 rs.getString("prevHash"),
                 rs.getLong("blockNumber"),
-                new ArrayList<>(),
+                rs.getString("merkelRoot"),
                 rs.getLong("timeStamp"),
                 keyMapper.map(rs, "validator", ctx),
                 rs.getBytes("blockSignature"),

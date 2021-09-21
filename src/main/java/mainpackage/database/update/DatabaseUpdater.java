@@ -17,12 +17,14 @@ public class DatabaseUpdater {
     }
 
     private void versionOneUpdate(Handle handle) {
+        // TODO: Make merkelRoot not null
         handle.execute("""
                 CREATE TABLE IF NOT EXISTS block (
                     hash char(64) not null,
                     prevHash char(64),
-                    blockNumber int8,
-                    timeStamp int8,
+                    blockNumber int8 not null,
+                    timeStamp int8 not null,
+                    merkelRoot char(64),
                     validator bytea not null,
                     blockSignature bytea not null,
                     primary key (hash),
