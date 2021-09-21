@@ -1,6 +1,7 @@
 package mainpackage.server;
 
 import mainpackage.blockchain.Chain;
+import mainpackage.blockchain.staking.StakeKeys;
 import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.server.message.HelloWorldMessage;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.HashSet;
 
@@ -104,7 +106,9 @@ public class ServerTest {
 
         //create new block with 1 transaction
         PrivateKey founderPrivate = KeyHelper.loadPrivateKey("founder_pk.der");
-        Transaction t1 = new Transaction(Chain.FOUNDER_WALLET, StakingTransaction.STAKING_WALLET, BigDecimal.ONE, BigDecimal.valueOf(0.1), "");
+        StakeKeys keys = new StakeKeys();
+        keys.generateFull(1);
+        Transaction t1 = new Transaction(Chain.FOUNDER_WALLET, StakingTransaction.STAKING_WALLET, BigDecimal.ONE, BigDecimal.valueOf(0.1), "STAKE@" + keys.getPublicPairs().get(0).one().toString() + keys.getPublicPairs().get(0).two().toString());
         t1.sign(founderPrivate);
         assertTrue(node1.addTransaction(t1));
         //add to lock blockchain

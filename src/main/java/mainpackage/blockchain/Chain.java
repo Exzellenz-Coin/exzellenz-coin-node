@@ -5,7 +5,6 @@ import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.util.KeyHelper;
 import mainpackage.util.Pair;
-import mainpackage.util.TransactionDataParser;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -171,7 +170,7 @@ public class Chain {
 									.forEach(validator -> validator.setStake(validator.getStake().add(stakeTransaction.getAmount())));
 						} else { //create new entry
 							try {
-								this.validators.add(new StakerIdentity(stakeTransaction.getSourceWalletId(), TransactionDataParser.parsePublicPairs(stakeTransaction.getData()), stakeTransaction.getAmount())); //todo: add the transactions from the message
+								this.validators.add(new StakerIdentity(stakeTransaction.getSourceWalletId(), StakingTransaction.parseDataToObject(stakeTransaction.getData().split("@")), stakeTransaction.getAmount())); //todo: add the transactions from the message
 							} catch (SignatureException e) {
 								e.printStackTrace();
 							} catch (InvalidKeyException e) {

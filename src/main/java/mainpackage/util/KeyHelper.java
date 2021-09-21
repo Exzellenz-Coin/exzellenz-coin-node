@@ -89,4 +89,12 @@ public class KeyHelper {
         fileOutputStream.flush();
         fileOutputStream.close();
     }
+
+    public static PublicKey publicKeyFromString(String data) {
+        return null; //TODO:
+    }
+
+    public static PublicKey privateKeyFromString(String data) {
+        return null; //TODO:
+    }
 }

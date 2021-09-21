@@ -41,7 +41,7 @@ public class Transaction implements Signable {
 
     public static boolean validValues(Transaction transaction) { //looks if this transaction makes sense outside the context of a blockchain
         try {
-            if (transaction.getAmount().compareTo(BigDecimal.ZERO) != 1 //amount is not greater than 0
+            if (transaction.getAmount().compareTo(BigDecimal.ZERO)  == -1 //amount is less than 0
                     || transaction.getTip().compareTo(BigDecimal.ZERO) == -1 //tip is less than 0
                     || !transaction.verifySignature(transaction.sourceWalletId) //could not verify signature
             ) {
@@ -49,6 +49,21 @@ public class Transaction implements Signable {
             }
         } catch (Exception e) {
             return false;
+        }
+
+        //special requirements for staking transactions
+        if (transaction.getTargetWalletId().equals(StakingTransaction.STAKING_WALLET)) {
+            if (transaction.getData() == null)
+                return false;
+            String[] dataSplit = transaction.getData().split("@");
+            if (dataSplit[0].equals(StakingTransaction.ID)) { //need valid keys
+                return StakingTransaction.parseDataToObject(dataSplit) != null;
+            } else if (dataSplit[0].equals(RestakingTransaction.ID)) { //need valid keys
+                return RestakingTransaction.parseDataToObject(dataSplit) != null;
+            } else if (dataSplit[0].equals(UnstakingTransaction.ID)) { //nothing needed
+                return true; //no further data needed
+            }
+            return false; //not recognized
         }
         return true;
     }

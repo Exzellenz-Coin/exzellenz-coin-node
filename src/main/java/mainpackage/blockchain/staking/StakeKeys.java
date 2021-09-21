@@ -14,7 +14,7 @@ public class StakeKeys {
     private List<Pair<PublicKey, byte[]>> publicPairs;
     private List<PrivateKey> privateKeys;
 
-    StakeKeys() {
+    public StakeKeys() {
         publicPairs = new ArrayList<>();
         privateKeys = new ArrayList<>();
     }
@@ -44,7 +44,7 @@ public class StakeKeys {
     //check if the private key a node send was unused and valid; update the private keys used
     public boolean tryAcceptPrivateKey(PrivateKey privateKey, byte[] signature, int index) throws SignatureException, InvalidKeyException {
         if (index < 0 || index > publicPairs.size() - 1)
-            throw new IllegalArgumentException("index for that key does not exist"); //todo: maybe return false?
+            throw new IllegalArgumentException("index for that key does not exist");
         if (privateKeys.contains(privateKey) || !StakeKeys.validatePrivate(publicPairs.get(index).two(), privateKey))
             return false;
         privateKeys.set(index, privateKey);
