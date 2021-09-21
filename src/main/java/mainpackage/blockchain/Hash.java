@@ -1,7 +1,7 @@
 package mainpackage.blockchain;
 
 import mainpackage.blockchain.transaction.Transaction;
-import mainpackage.util.Trees.MerkelNode;
+import mainpackage.blockchain.Trees.MerkelNode;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -17,7 +17,10 @@ public class Hash {
 				.append(DELIMITER)
 				.append(block.getValidator())
 				.append(DELIMITER)
-				.append(new String(block.getSignature()));
+				.append(new String(block.getSignature()))
+				.append(DELIMITER)
+				.append(block.getMerkelRoot());
+		/* //old way
 		for (final Transaction transaction : block.getTransactions()) {
 			builder.append(DELIMITER)
 					.append(transaction.getSourceWalletId())
@@ -32,6 +35,7 @@ public class Hash {
 					.append(DELIMITER)
 					.append(new String(transaction.getSignature()));
 		}
+		 */
 		return applySha256(builder.toString());
 	}
 

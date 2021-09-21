@@ -38,7 +38,7 @@ public class FullNode implements INode {
 		//TODO: load blockchain from storage
 		this.unofficialTransactions = new ArrayList<>();
 		this.newBlock = null; //have to set this after you have the newest blockchain
-		this.stakeKeys = null; //have to set this after you first stake
+		this.stakeKeys = new StakeKeys(); //TODO: generate keys upon staking!!!
 		try {
 			nodeWallet = KeyHelper.loadPublicKey("node_wallet.der");
 			nodePrivateKey = KeyHelper.loadPrivateKey("node_pk.der");
@@ -73,7 +73,7 @@ public class FullNode implements INode {
 			return false;
 		}
 		if ((force || blockChain.permittedToValidateNewBlock(nodeWallet)) && blockChain.tryAddBlockSync(newBlock)) {
-			server.sendToAll(new CreatedBlockMessage(newBlock));
+			server.sendToAll(new CreatedBlockMessage(newBlock, stakeKeys.popPrivateKey()));
 			return true;
 		}
 		return false;
@@ -82,7 +82,7 @@ public class FullNode implements INode {
 	@Override
 	public void finalizeBlock() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
 		//template block
-		newBlock =  new Block(blockChain.getHead().getHash(), blockChain.getHead().getBlockNumber() + 1, new ArrayList<Transaction>(), nodeWallet);
+		newBlock =  new Block(blockChain.getHead().getHash(), blockChain.getHead().getBlockNumber() + 1, new ArrayList<>(), nodeWallet);
 		//sort transactions based on highest tips and add to the block
 		unofficialTransactions.sort(Comparator.comparing(Transaction::getTip));
 		while (unofficialTransactions.size() != 0 && newBlock.getTransactions().size() != Block.MAX_TRANSACTIONS) {

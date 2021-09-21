@@ -11,6 +11,7 @@ import java.util.List;
 public class StakeKeys {
     private static byte[] SHARED_SIGNABLE = "SIGNME".getBytes(StandardCharsets.UTF_8); //every node signs the same data
     private int amount;
+    private int headIndex;
     private List<Pair<PublicKey, byte[]>> publicPairs;
     private List<PrivateKey> privateKeys;
 
@@ -30,6 +31,7 @@ public class StakeKeys {
             privateKeys.add(kp.getPrivate());
             publicPairs.add(new Pair(kp.getPublic(), StakeKeys.signData(kp.getPublic(), kp.getPrivate())));
         }
+        headIndex = amount;
     }
 
     public void generateEmpty(List<Pair<PublicKey, byte[]>> publicPairs) throws SignatureException, InvalidKeyException { //initializes empty
@@ -39,16 +41,25 @@ public class StakeKeys {
         this.publicPairs = publicPairs;
         this.privateKeys.clear();
         this.publicPairs.forEach(k -> this.privateKeys.add(null)); //private key filled with this.amount of null objects
+        this.headIndex = 0;
     }
 
     //check if the private key a node send was unused and valid; update the private keys used
-    public boolean tryAcceptPrivateKey(PrivateKey privateKey, byte[] signature, int index) throws SignatureException, InvalidKeyException {
-        if (index < 0 || index > publicPairs.size() - 1)
+    public boolean tryAcceptPrivateKey(PrivateKey privateKey) throws SignatureException, InvalidKeyException {
+        if (headIndex != amount)
             throw new IllegalArgumentException("index for that key does not exist");
-        if (privateKeys.contains(privateKey) || !StakeKeys.validatePrivate(publicPairs.get(index).two(), privateKey))
+        if (privateKeys.contains(privateKey) || !StakeKeys.validatePrivate(publicPairs.get(headIndex).two(), privateKey))
             return false;
-        privateKeys.set(index, privateKey);
+        privateKeys.set(headIndex, privateKey);
+        headIndex++;
         return true;
+    }
+
+    //returns the next unused private key
+    public PrivateKey popPrivateKey() {
+        if (headIndex == amount)
+            return null;
+        return privateKeys.get(headIndex++);
     }
 
     public List<Pair<PublicKey, byte[]>> getPublicPairs() {

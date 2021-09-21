@@ -11,8 +11,4 @@ public class UnstakingTransaction extends Transaction {
     public UnstakingTransaction(PublicKey targetWalletID, BigDecimal amount, BigDecimal tip, byte[] signature) {
         super(null, targetWalletID, amount, tip, ID, signature);
     }
-
-    public static List<Pair<PublicKey, byte[]>> parseDataToObject(String[] data) { //the data of a transaction minus the first parameter
-        return null;
-    }
 }

@@ -10,14 +10,15 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.security.InvalidKeyException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Chain {
+	public static long EPOCH = 100;
 	public static PublicKey FOUNDER_WALLET;
-
 	static {
 		try {
 			FOUNDER_WALLET = KeyHelper.loadPublicKey("founder_wallet.der");
@@ -31,7 +32,6 @@ public class Chain {
 	private static final BigDecimal MIN_STAKE = BigDecimal.valueOf(69); //minimum stake to become a staker
 	private static final BigDecimal PENALTY = BigDecimal.ONE; //penalty for stakers that do not valdiate a block
 	private final List<Block> blockChain;
-	//private final List<Pair<PublicKey, BigDecimal>> validators;  //public key and stake of VALID stakers
 	private final List<StakerIdentity> validators;
 	private final Map<PublicKey, BigDecimal> wallets; //wallets that have received coins and their current balances
 
@@ -43,10 +43,11 @@ public class Chain {
 	}
 
 	public void addBlock(final Block block) {
-		// if (!block.getPrevHash().equals(getHead().getHash())) throw new IllegalArgumentException("Block must have the current head as previous block!");
 		blockChain.add(block);
 		updateWallets(blockChain.size() - 1);
-		updateValidators(blockChain.size() - 1);
+		if (block.getBlockNumber() % EPOCH == 0 && block.getBlockNumber() != 0) { //new epoch started
+			extractValidators(block.getBlockNumber());
+		}
 	}
 
 	public synchronized boolean tryAddBlockSync(final Block block) {
@@ -55,6 +56,14 @@ public class Chain {
 			return true;
 		}
 		return false;
+	}
+
+	public synchronized boolean tryAddPrivateValidatorKeySync(PublicKey publicKey, PrivateKey privateKey) {
+		try {
+			return this.validators.stream().filter(e -> e.getPublicKey().equals(publicKey)).findAny().get().getStakeKeys().tryAcceptPrivateKey(privateKey);
+		} catch(Exception e) {
+			return false;
+		}
 	}
 
 	public boolean permittedToValidateNewBlock(PublicKey validator) {
@@ -107,33 +116,14 @@ public class Chain {
 		return weights.get(weights.size() - 1).one();
 	}
 
-	public ArrayList<PublicKey> getLeaders(Block block, int depth) {
-		if (depth <= 0)
-			throw new IndexOutOfBoundsException("Index must be greater than 0");
-		Map<PublicKey, BigDecimal> mapping = validators.stream().collect(Collectors.toMap(StakerIdentity::getPublicKey, StakerIdentity::getStake)); //todo: check this, i changed it
-		ArrayList<PublicKey> result = new ArrayList<>();
-		for (int i = 0; i < depth; i++) {
-			List<Pair<PublicKey, BigDecimal>> temp = mapping.entrySet().stream()
-					.map(e -> new Pair<>(e.getKey(), e.getValue())).collect(Collectors.toList());
-			PublicKey leader = getLeader(block, temp);
-			result.add(leader);
-			mapping.remove(leader);
-		}
-		return result;
-	}
-
 	public boolean isValidBlock(Block block) {
-		return isValidBlock(block, false);
-	}
-	public boolean isValidBlock(Block block, boolean checkStaker) {
 		Block lastValid = blockChain.get(blockChain.size() - 1);
 		return lastValid.getHash().equals(block.getPrevHash()) //wrong last hash
-				&& Hash.createHash(block).equals(block.getHash()) //wrong hash
-				&& (!checkStaker || !block.verifySignature(block.getValidator())); //TODO: add signature check
+				&& Hash.createHash(block).equals(block.getHash()); //wrong hash
 	}
 
-	public boolean isValidChain() {
-		return isValidChain(1);
+	public boolean isValidNewBlock(Block block) {
+		return isValidBlock(block) && !block.verifySignature(block.getValidator()); //TODO: add signature check
 	}
 
 	public boolean isValidChain(int beginBlock) throws IndexOutOfBoundsException {
@@ -151,17 +141,14 @@ public class Chain {
 		return true;
 	}
 
-	public void updateValidators() {
-		updateValidators(1);
-	}
-
-	public void updateValidators(int beginBlock) throws IndexOutOfBoundsException { //TODO: create tests
-		if (beginBlock < 0)
-			throw new IndexOutOfBoundsException("Index must be greater than 0");
+	public void extractValidators(long beginBlock) throws IndexOutOfBoundsException { //gets the stakers from transactions during the previous epoch
+		if (beginBlock - EPOCH  < 0)
+			throw new IndexOutOfBoundsException("Last epoch must exist");
 		if (beginBlock > this.blockChain.size())
 			throw new IndexOutOfBoundsException("Index exceeds length of chain");
-		for (int i = beginBlock; i < this.blockChain.size(); i++) {
-			List<Transaction> cur = this.blockChain.get(i).getTransactions();
+		this.validators.clear();
+		for (long i = beginBlock - EPOCH; i < beginBlock; i++) {
+			List<Transaction> cur = this.blockChain.get((int)i).getTransactions();
 			cur.stream()
 					.filter(e -> e.getTargetWalletId().equals(StakingTransaction.STAKING_WALLET)) //only staking transactions
 					.forEach(stakeTransaction -> {
@@ -214,15 +201,14 @@ public class Chain {
 			//block reward
 			BigDecimal tips = curTransactions.stream().map(Transaction::getTip).reduce(BigDecimal.ZERO, BigDecimal::add);
 			if (this.wallets.containsKey(validatorWallet)) {
-				this.wallets.replace(validatorWallet, this.wallets.get(validatorWallet).add(tips.add(calculateReward(curBlock))));
+				this.wallets.replace(validatorWallet, this.wallets.get(validatorWallet).add(tips.add(calculateReward(curBlock.getBlockNumber()))));
 			} else {
 				this.wallets.put(validatorWallet, tips);
 			}
 		}
 	}
 
-	public BigDecimal calculateReward(Block block) { //this is the staker reward for validating a block
-		int index = blockChain.indexOf(block);
+	public BigDecimal calculateReward(long index) { //this is the staker reward for validating a block
 		if (index == -1)
 			throw new NoSuchElementException("Could not find block in blockchain");
 		if (index == 0)

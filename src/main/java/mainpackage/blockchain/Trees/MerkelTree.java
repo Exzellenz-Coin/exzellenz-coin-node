@@ -1,4 +1,4 @@
-package mainpackage.util.Trees;
+package mainpackage.blockchain.Trees;
 
 import mainpackage.blockchain.Hash;
 import mainpackage.blockchain.transaction.Transaction;
