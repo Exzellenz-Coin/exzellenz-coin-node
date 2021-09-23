@@ -116,7 +116,7 @@ public class ChainTest {
     @Disabled //todo: working on this
 	@DisplayName("Update Wallet Test")
 	public void testWalletCache() {
-		assertEquals(BigDecimal.valueOf(100), chain.getCachedAmount(Chain.FOUNDER_WALLET)); //initial funds
+		assertEquals(BigDecimal.valueOf(100), chain.getAmount(Chain.FOUNDER_WALLET)); //initial funds
 		chain.addBlock(new Block(
 						chain.getHead().getHash(),
                         0,
@@ -130,7 +130,7 @@ public class ChainTest {
 						Chain.FOUNDER_WALLET
 				)
 		);
-		assertEquals(BigDecimal.valueOf(196).setScale(Transaction.DOWN_ROUNDING_SCALE, RoundingMode.DOWN), chain.getCachedAmount(Chain.FOUNDER_WALLET)); //initial funds
-		assertEquals(BigDecimal.valueOf(4), chain.getCachedAmount(StakingTransaction.STAKING_WALLET)); //initial funds
+		assertEquals(BigDecimal.valueOf(196).setScale(Transaction.DOWN_ROUNDING_SCALE, RoundingMode.DOWN), chain.getAmount(Chain.FOUNDER_WALLET)); //initial funds
+		assertEquals(BigDecimal.valueOf(4), chain.getAmount(StakingTransaction.STAKING_WALLET)); //initial funds
 	}
 }

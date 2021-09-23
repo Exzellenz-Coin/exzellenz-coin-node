@@ -16,7 +16,7 @@ public class Transaction implements Signable {
     private PublicKey targetWalletId;
     private BigDecimal amount;
     private BigDecimal tip; //validiators prioritize a higher tip
-    private String data; //TODO: add data to the hash
+    private String data;
     private byte[] signature; //transaction author signature
 
     private Transaction() {

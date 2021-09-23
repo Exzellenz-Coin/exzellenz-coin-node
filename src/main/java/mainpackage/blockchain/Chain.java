@@ -28,6 +28,7 @@ public class Chain {
 		}
 	}
 
+	private static final long MIN_BLOCK_DELAY = 1; //TODO: set to something reasonable
 	private static final BigDecimal INITIAL_REWARD = BigDecimal.valueOf(100);
 	private static final BigDecimal MIN_STAKE = BigDecimal.valueOf(69); //minimum stake to become a staker
 	private static final BigDecimal PENALTY = BigDecimal.ONE; //penalty for stakers that do not valdiate a block
@@ -67,7 +68,7 @@ public class Chain {
 	}
 
 	public boolean permittedToValidateNewBlock(PublicKey validator) {
-		return true; //TODO: overhaul validator selection
+		return validator.equals(getLeader(this.getHead(), validators));
 	}
 
 	public Block get(int index) {
@@ -78,11 +79,10 @@ public class Chain {
 		return get(blockChain.size() - 1);
 	} //most recent valid block
 
-	public BigDecimal getCachedAmount(PublicKey wallet) {
-		return wallets.get(wallet);
-	}
-
 	public BigDecimal getAmount(PublicKey wallet) { //TODO: make this use the cached values
+		if (wallets.containsKey(wallet))
+			return wallets.get(wallet);
+		//not cached, check manually
 		var amount = new BigDecimal(0);
 		for (final Block block : blockChain) {
 			for (final Transaction transaction : block.getTransactions()) {
@@ -99,15 +99,18 @@ public class Chain {
 		return amount;
 	}
 
-	private PublicKey getLeader(Block block, List<Pair<PublicKey, BigDecimal>> validators) {
-		if (validators.size() == 0)
+	private PublicKey getLeader(Block block, List<StakerIdentity> validators) {
+		if (System.currentTimeMillis() - block.getTimeStamp() < MIN_BLOCK_DELAY) { //initial block creation delay
+			return null;
+		}
+		if (validators.size() == 0) //if there are no stakers, the founder validates
 			return Chain.FOUNDER_WALLET;
-		long seed = new BigInteger(block.getHash().getBytes()).longValue();
+		long seed = new BigInteger(block.getHash().getBytes()).longValue(); //previous block used as an agreed upon "seed"
 		Random rdm = new Random(seed); //randomness based on the most recent accepted block hash
-		BigDecimal sum = validators.stream().map(Pair::two).reduce(BigDecimal.ZERO, BigDecimal::add, BigDecimal::add);
+		BigDecimal sum = validators.stream().map(StakerIdentity::getStake).reduce(BigDecimal.ZERO, BigDecimal::add, BigDecimal::add);
 		List<Pair<PublicKey, BigDecimal>> weights = validators.stream()
-				.map(p -> new Pair<>(p.one(), p.two().divide(sum, RoundingMode.HALF_EVEN))).collect(Collectors.toList());
-		BigDecimal selector = BigDecimal.valueOf(rdm.nextDouble());
+				.map(p -> new Pair<>(p.getPublicKey(), p.getStake().divide(sum, RoundingMode.HALF_EVEN))).collect(Collectors.toList());
+		BigDecimal selector = BigDecimal.valueOf(rdm.nextDouble() + Math.round(block.getTimeStamp() / MIN_BLOCK_DELAY));
 		for (Pair<PublicKey, BigDecimal> pair : weights) {
 			if (pair.two().compareTo(selector) >= 0) {
 				return pair.one();

@@ -1,5 +1,6 @@
 package mainpackage.blockchain.transaction;
 
+import mainpackage.blockchain.staking.StakeKeys;
 import mainpackage.util.KeyHelper;
 import mainpackage.util.Pair;
 
@@ -22,8 +23,8 @@ public class StakingTransaction extends Transaction {
         }
     }
 
-    public StakingTransaction(PublicKey sourceWalletId, BigDecimal amount, BigDecimal tip, byte[] signature) {
-        super(sourceWalletId, STAKING_WALLET, amount, tip, ID, signature);
+    public StakingTransaction(PublicKey sourceWalletId, BigDecimal amount, BigDecimal tip, StakeKeys keys) {
+        super(sourceWalletId, STAKING_WALLET, amount, tip, ID + "@" + keys.toString());
     }
 
     public static List<Pair<PublicKey, byte[]>> parseDataToObject(String[] data) { //the data of a transaction minus the first parameter

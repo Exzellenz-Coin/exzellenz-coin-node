@@ -3,14 +3,17 @@ package mainpackage.server.node;
 import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
 import mainpackage.blockchain.staking.StakeKeys;
+import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.server.Server;
 import mainpackage.server.message.block.CreatedBlockMessage;
 import mainpackage.server.message.chain.RequestChainLengthMessage;
+import mainpackage.server.message.transaction.CreatedTransactionMessage;
 import mainpackage.util.KeyHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,6 +24,8 @@ import java.util.Set;
  * An implementation of INode that can perform every possible action.
  */
 public class FullNode implements INode {
+	private static BigDecimal DEFAULT_TIP = BigDecimal.valueOf(0.000001);
+
 	protected static final Logger logger = LogManager.getLogger(FullNode.class);
 	protected Server server;
 	protected final Set<NodeEntry> network;
@@ -35,7 +40,6 @@ public class FullNode implements INode {
 		this.server = new Server(this);
 		this.network = new HashSet<>();
 		this.blockChain = new Chain();
-		//TODO: load blockchain from storage
 		this.unofficialTransactions = new ArrayList<>();
 		this.newBlock = null; //have to set this after you have the newest blockchain
 		this.stakeKeys = new StakeKeys(); //TODO: generate keys upon staking!!!
@@ -159,5 +163,12 @@ public class FullNode implements INode {
 			return true;
 		}
 		return false;
+	}
+
+	public boolean stake(BigDecimal amount) throws SignatureException, InvalidKeyException {
+		var transaction = new StakingTransaction(nodeWallet, amount, DEFAULT_TIP, stakeKeys);
+		transaction.sign(nodePrivateKey);
+		server.sendToAll(new CreatedTransactionMessage(transaction));
+		return true;
 	}
 }

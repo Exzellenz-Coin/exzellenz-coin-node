@@ -20,7 +20,6 @@ public class Hash {
 				.append(new String(block.getSignature()))
 				.append(DELIMITER)
 				.append(block.getMerkelRoot());
-		/* //old way
 		for (final Transaction transaction : block.getTransactions()) {
 			builder.append(DELIMITER)
 					.append(transaction.getSourceWalletId())
@@ -35,7 +34,6 @@ public class Hash {
 					.append(DELIMITER)
 					.append(new String(transaction.getSignature()));
 		}
-		 */
 		return applySha256(builder.toString());
 	}
 

@@ -85,6 +85,7 @@ public class ServerTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Testing new block creation Test")
     public void newBlockTest() throws Exception {
         // Create 3 nodes and connect the servers
