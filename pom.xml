@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>ExcellenceCoinNode</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
@@ -159,7 +159,7 @@
     <distributionManagement>
         <repository>
             <id>myMavenRepoWrite</id>
-            <!-- suppress UnresolvedMavenProperty -->
+            <!--suppress MavenModelInspection -->
             <url>${myMavenRepoWriteUrl}</url>
         </repository>
     </distributionManagement>
