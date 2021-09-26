@@ -11,6 +11,8 @@ import mainpackage.server.message.AbstractMessage;
 import java.security.PrivateKey;
 
 public class CreatedTransactionMessage extends AbstractMessage {
+    @JsonIgnore
+    private boolean shouldRelay = false;
     @JsonProperty
     private Transaction transaction;
 
@@ -23,11 +25,13 @@ public class CreatedTransactionMessage extends AbstractMessage {
 
     @Override
     public void handle(Peer sender) {
-        return; //TODO
+        if (sender.getNode().addTransaction(transaction)) {
+            this.shouldRelay = true;
+        }
     }
 
     @Override
     public boolean shouldRelay() {
-        return true;
+        return shouldRelay;
     }
 }

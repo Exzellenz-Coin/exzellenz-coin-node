@@ -32,14 +32,13 @@ public class CreatedBlockMessage extends AbstractMessage {
     public void handle(Peer sender) {
         try {
             //check if the private key "ticket" is not invalid
-            if (this.block.getBlockNumber() >= Chain.EPOCH //first epoch is solely validated by the root wallet
-                    && !sender.getNode().getBlockChain().tryAddPrivateValidatorKeySync(block.getValidator(), privateKey))
+            if (this.block.getBlockNumber() >= Chain.EPOCH //no checks for the first epoch
+                    && !sender.getNode().getBlockChain().tryAddPrivateValidatorKeySync(block.getValidator(), privateKey)) //remember private key
                 return;
             //if it is, attempt add
             if (sender.getNode().getBlockChain().isValidNewBlock(this.block)) {
                 sender.getNode().getBlockChain().addBlock(this.block);
                 this.shouldRelay = true;
-                //sender.send(new CreatedBlockMessage(this.block)); //forward message if valid
             }
         } catch (Exception e) {
 

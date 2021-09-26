@@ -21,7 +21,7 @@ public class Block implements Signable {
     private long blockNumber;
     private List<Transaction> transactions;
     private long timeStamp;
-    private String merkelRoot; //TODO: change list of transactions to merkel tree
+    private String merkelRoot;
     private PublicKey validator; //rewards sent here
     private byte[] signature; //staker signature
     private String hash; //hash of this block
@@ -114,16 +114,6 @@ public class Block implements Signable {
         return signature;
     }
 
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Block block = (Block) o;
-        return timeStamp == block.timeStamp && Objects.equals(prevHash, block.prevHash) && Objects.equals(transactions, block.transactions) && Objects.equals(validator, block.validator) && Arrays.equals(signature, block.signature) && Objects.equals(hash, block.hash);
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(prevHash, timeStamp, transactions, hash, validator, signature);
@@ -158,6 +148,14 @@ public class Block implements Signable {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Block block = (Block) o;
+        return timeStamp == block.timeStamp && Objects.equals(prevHash, block.prevHash) && Objects.equals(transactions, block.transactions) && Objects.equals(validator, block.validator) && Arrays.equals(signature, block.signature) && Objects.equals(hash, block.hash) && Objects.equals(merkelRoot, block.merkelRoot) && Objects.equals(blockNumber, block.blockNumber);
     }
 
     @Override

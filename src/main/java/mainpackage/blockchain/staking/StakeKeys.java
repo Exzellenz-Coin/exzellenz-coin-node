@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StakeKeys {
-    private static byte[] SHARED_SIGNABLE = "SIGNME".getBytes(StandardCharsets.UTF_8); //every node signs the same data
+    private final static String SHARED_DATA = "SIGNME";
+    private final static byte[] SHARED_SIGNABLE = SHARED_DATA.getBytes(StandardCharsets.UTF_8); //every node signs the same data
     private int amount;
     private int headIndex;
     private List<Pair<PublicKey, byte[]>> publicPairs;

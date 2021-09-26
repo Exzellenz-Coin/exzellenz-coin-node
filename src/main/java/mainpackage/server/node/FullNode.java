@@ -3,12 +3,17 @@ package mainpackage.server.node;
 import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
 import mainpackage.blockchain.staking.StakeKeys;
+import mainpackage.blockchain.transaction.RestakingTransaction;
 import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
+import mainpackage.blockchain.transaction.UnstakingTransaction;
 import mainpackage.server.Server;
 import mainpackage.server.message.block.CreatedBlockMessage;
 import mainpackage.server.message.chain.RequestChainLengthMessage;
+import mainpackage.server.message.transaction.CreatedRestakingTransactionMessage;
+import mainpackage.server.message.transaction.CreatedStakingTransactionMessage;
 import mainpackage.server.message.transaction.CreatedTransactionMessage;
+import mainpackage.server.message.transaction.CreatedUnstakingTransactionMessage;
 import mainpackage.util.KeyHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +29,8 @@ import java.util.Set;
  * An implementation of INode that can perform every possible action.
  */
 public class FullNode implements INode {
-	private static BigDecimal DEFAULT_TIP = BigDecimal.valueOf(0.000001);
+	private static BigDecimal DEFAULT_TIP = BigDecimal.valueOf(0.000001); //give this normally
+	private static BigDecimal DEFAULT_ACCEPT_TIP = BigDecimal.valueOf(0); //accept everything >=
 
 	protected static final Logger logger = LogManager.getLogger(FullNode.class);
 	protected Server server;
@@ -42,7 +48,7 @@ public class FullNode implements INode {
 		this.blockChain = new Chain();
 		this.unofficialTransactions = new ArrayList<>();
 		this.newBlock = null; //have to set this after you have the newest blockchain
-		this.stakeKeys = new StakeKeys(); //TODO: generate keys upon staking!!!
+		this.stakeKeys = new StakeKeys(); //these need to be set based on the epoch
 		try {
 			nodeWallet = KeyHelper.loadPublicKey("node_wallet.der");
 			nodePrivateKey = KeyHelper.loadPrivateKey("node_pk.der");
@@ -84,7 +90,7 @@ public class FullNode implements INode {
 	}
 
 	@Override
-	public void finalizeBlock() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+	public void finalizeBlock() throws SignatureException, InvalidKeyException {
 		//template block
 		newBlock =  new Block(blockChain.getHead().getHash(), blockChain.getHead().getBlockNumber() + 1, new ArrayList<>(), nodeWallet);
 		//sort transactions based on highest tips and add to the block
@@ -94,7 +100,7 @@ public class FullNode implements INode {
 			if (blockChain.isValidTransaction(cur)) {
 				newBlock.getTransactions().add(cur);
 			}
-			unofficialTransactions.remove(0);
+			unofficialTransactions.remove(0); //removes invalid and used transactions
 		}
 		//sign and hash
 		newBlock.sign(nodePrivateKey);
@@ -113,7 +119,7 @@ public class FullNode implements INode {
 
 	@Override
 	public Chain getBlockChain() {
-		return this.blockChain;
+		return blockChain;
 	}
 
 	@Override
@@ -158,17 +164,43 @@ public class FullNode implements INode {
 
 	@Override
 	public boolean addTransaction(Transaction transaction) {
-		if (Transaction.validValues(transaction) && !unofficialTransactions.contains(transaction)) {
+		if (Transaction.validValues(transaction) && !unofficialTransactions.contains(transaction) && blockChain.isValidTransaction(transaction)) {
 			unofficialTransactions.add(transaction);
+			server.sendToAll(new CreatedTransactionMessage(transaction));
 			return true;
 		}
 		return false;
 	}
 
+	//node staking transaction creation
 	public boolean stake(BigDecimal amount) throws SignatureException, InvalidKeyException {
-		var transaction = new StakingTransaction(nodeWallet, amount, DEFAULT_TIP, stakeKeys);
+		stakeKeys.generateFull(blockChain.calculateNumberStakeKeys(amount)); //generate keys
+		StakingTransaction transaction = new StakingTransaction(nodeWallet, amount, DEFAULT_TIP, stakeKeys);
 		transaction.sign(nodePrivateKey);
-		server.sendToAll(new CreatedTransactionMessage(transaction));
-		return true;
+		if (addTransaction(transaction)) {
+			server.sendToAll(new CreatedStakingTransactionMessage(transaction));
+			return true;
+		}
+		return false;
+	}
+
+	public boolean unstake(BigDecimal amount) throws SignatureException, InvalidKeyException {
+		UnstakingTransaction transaction = new UnstakingTransaction(nodeWallet, amount, DEFAULT_TIP);
+		transaction.sign(nodePrivateKey);
+		if (addTransaction(transaction)) {
+			server.sendToAll(new CreatedUnstakingTransactionMessage(transaction));
+			return true;
+		}
+		return false;
+	}
+
+	public boolean restake(BigDecimal amount) throws SignatureException, InvalidKeyException {
+		RestakingTransaction transaction = new RestakingTransaction(nodeWallet, amount, DEFAULT_TIP);
+		transaction.sign(nodePrivateKey);
+		if (addTransaction(transaction)) {
+			server.sendToAll(new CreatedTransactionMessage(transaction));
+			return true;
+		}
+		return false;
 	}
 }

@@ -79,7 +79,7 @@ public class Chain {
 		return get(blockChain.size() - 1);
 	} //most recent valid block
 
-	public BigDecimal getAmount(PublicKey wallet) { //TODO: make this use the cached values
+	public BigDecimal getAmount(PublicKey wallet) {
 		if (wallets.containsKey(wallet))
 			return wallets.get(wallet);
 		//not cached, check manually
@@ -126,7 +126,7 @@ public class Chain {
 	}
 
 	public boolean isValidNewBlock(Block block) {
-		return isValidBlock(block) && !block.verifySignature(block.getValidator()); //TODO: add signature check
+		return isValidBlock(block) && !block.verifySignature(block.getValidator());
 	}
 
 	public boolean isValidChain(int beginBlock) throws IndexOutOfBoundsException {
@@ -160,7 +160,7 @@ public class Chain {
 									.forEach(validator -> validator.setStake(validator.getStake().add(stakeTransaction.getAmount())));
 						} else { //create new entry
 							try {
-								this.validators.add(new StakerIdentity(stakeTransaction.getSourceWalletId(), StakingTransaction.parseDataToObject(stakeTransaction.getData().split("@")), stakeTransaction.getAmount())); //todo: add the transactions from the message
+								this.validators.add(new StakerIdentity(stakeTransaction.getSourceWalletId(), StakingTransaction.parseDataToObject(stakeTransaction.getData().split("@")), stakeTransaction.getAmount()));
 							} catch (SignatureException e) {
 								e.printStackTrace();
 							} catch (InvalidKeyException e) {
@@ -223,6 +223,10 @@ public class Chain {
 		if (!wallets.containsKey(transaction.getSourceWalletId()))
 			return false;
 		return transaction.getAmount().add(transaction.getTip()).compareTo(wallets.get(transaction.getSourceWalletId())) != 1;
+	}
+
+	public int calculateNumberStakeKeys(BigDecimal stakeAmount) {
+		return 100; //TODO: need some algorithm for this
 	}
 
 	public int size() {

@@ -12,6 +12,7 @@ import static org.bouncycastle.util.Arrays.concatenate;
 
 public class Transaction implements Signable {
     public static int DOWN_ROUNDING_SCALE = 10;
+    public static String DATA_SPLIT_REGEX = "@";
     private PublicKey sourceWalletId;
     private PublicKey targetWalletId;
     private BigDecimal amount;
@@ -55,7 +56,7 @@ public class Transaction implements Signable {
         if (transaction.getTargetWalletId().equals(StakingTransaction.STAKING_WALLET)) {
             if (transaction.getData() == null)
                 return false;
-            String[] dataSplit = transaction.getData().split("@");
+            String[] dataSplit = transaction.getData().split(Transaction.DATA_SPLIT_REGEX);
             if (dataSplit[0].equals(StakingTransaction.ID)) { //need valid keys
                 return StakingTransaction.parseDataToObject(dataSplit) != null;
             } else if (dataSplit[0].equals(RestakingTransaction.ID)) { //need valid keys
@@ -120,7 +121,7 @@ public class Transaction implements Signable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Transaction that)) return false;
-        return Objects.equals(sourceWalletId, that.sourceWalletId) && Objects.equals(targetWalletId, that.targetWalletId) && Objects.equals(amount, that.amount) && Objects.equals(tip, that.tip) && Objects.equals(data, that.data) && Arrays.equals(signature, that.signature);
+        return Objects.equals(sourceWalletId, that.sourceWalletId) && Objects.equals(targetWalletId, that.targetWalletId) && Objects.equals(amount, that.amount) && Objects.equals(tip, that.tip) && Objects.equals(data, that.data) && Arrays.equals(signature, that.signature) && Objects.equals(data, that.data);
     }
 
     @Override
