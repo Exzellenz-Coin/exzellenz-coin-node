@@ -22,9 +22,8 @@ public class PublicKeyDeserializer extends StdDeserializer<PublicKey> {
 
     @Override
     public PublicKey deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        var spec = new X509EncodedKeySpec(Base64.getDecoder().decode(p.getValueAsString()));
         try {
-            return KeyHelper.keyFactory.generatePublic(spec);
+            return KeyHelper.publicKeyFromString(p.getValueAsString());
         } catch (InvalidKeySpecException e) {
             throw new IOException(e);
         }

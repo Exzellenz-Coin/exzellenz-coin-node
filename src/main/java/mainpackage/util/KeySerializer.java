@@ -19,6 +19,6 @@ public class KeySerializer extends StdSerializer<Key> {
 
     @Override
     public void serialize(Key value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        jgen.writeString(Base64.getEncoder().encodeToString(value.getEncoded()));
+        jgen.writeString(KeyHelper.keyToString(value));
     }
 }

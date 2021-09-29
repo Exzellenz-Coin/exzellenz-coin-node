@@ -10,8 +10,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 public class KeyHelper {
     private static final Logger logger = LogManager.getLogger(KeyHelper.class);
@@ -90,11 +92,17 @@ public class KeyHelper {
         fileOutputStream.close();
     }
 
-    public static PublicKey publicKeyFromString(String data) {
-        return null; //TODO:
+    public static String keyToString(Key key) {
+        return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
-    public static PublicKey privateKeyFromString(String data) {
-        return null; //TODO:
+    public static PublicKey publicKeyFromString(String data) throws InvalidKeySpecException {
+        var spec = new X509EncodedKeySpec(Base64.getDecoder().decode(data));
+        return keyFactory.generatePublic(spec);
+    }
+
+    public static PrivateKey privateKeyFromString(String data) throws InvalidKeySpecException {
+        var spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(data));
+        return keyFactory.generatePrivate(spec);
     }
 }
