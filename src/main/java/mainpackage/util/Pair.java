@@ -8,10 +8,8 @@ public record Pair<A,B>(A one, B two) {
     public boolean equals(Object o)
     {
         if (o instanceof Pair<?, ?> pair) {
-            if (one.getClass().isArray() || two.getClass().isArray()) { //array equals
-                return one.equals(pair.one) && Objects.deepEquals(two, pair.two);
-            }
-            return one.equals(pair.one) && two.equals(pair.two);
+            return one.getClass().isArray() ? Objects.deepEquals(one, pair.one) : one.equals(pair.one)
+                    && two.getClass().isArray() ? Objects.deepEquals(two, pair.two) : two.equals(pair.two);
         }
         return false;
     }
