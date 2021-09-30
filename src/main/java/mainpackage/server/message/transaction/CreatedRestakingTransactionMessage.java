@@ -3,7 +3,6 @@ package mainpackage.server.message.transaction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import mainpackage.blockchain.transaction.RestakingTransaction;
-import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.server.Peer;
 import mainpackage.server.message.AbstractMessage;

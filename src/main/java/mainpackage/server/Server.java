@@ -156,7 +156,7 @@ public class Server extends Thread {
     /**
      * Creates a Peer instance for a connection.
      *
-     * @param socket The socket
+     * @param socket    The socket
      * @param nodeEntry The NodeEntry of the remote node
      * @return The created Peer instance
      * @throws IOException If there was a network error

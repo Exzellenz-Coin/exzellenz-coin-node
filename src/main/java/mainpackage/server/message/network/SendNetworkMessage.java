@@ -5,7 +5,6 @@ import mainpackage.server.Peer;
 import mainpackage.server.message.AbstractMessage;
 import mainpackage.server.node.NodeEntry;
 
-import java.util.List;
 import java.util.Set;
 
 public class SendNetworkMessage extends AbstractMessage {

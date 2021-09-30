@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
 
 public class PrivateKeyDeserializer extends StdDeserializer<PrivateKey> {
     public PrivateKeyDeserializer() {

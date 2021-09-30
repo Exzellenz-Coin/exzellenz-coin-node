@@ -1,12 +1,7 @@
 package mainpackage.server.message;
 
-import java.security.InvalidKeyException;
-import java.security.SignatureException;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import mainpackage.server.Peer;
 import mainpackage.server.message.block.CreatedBlockMessage;
 import mainpackage.server.message.block.RequestBlockMessage;
@@ -17,6 +12,8 @@ import mainpackage.server.message.network.JoinNetworkMessage;
 import mainpackage.server.message.network.LeaveNetworkMessage;
 import mainpackage.server.message.network.RequestNetworkMessage;
 import mainpackage.server.message.network.SendNetworkMessage;
+
+import java.util.UUID;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

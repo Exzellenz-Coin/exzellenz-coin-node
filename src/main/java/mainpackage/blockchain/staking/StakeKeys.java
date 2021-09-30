@@ -5,7 +5,10 @@ import mainpackage.util.KeyHelper;
 import mainpackage.util.Pair;
 
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -22,6 +25,26 @@ public class StakeKeys {
     public StakeKeys() {
         publicPairs = new ArrayList<>();
         privateKeys = new ArrayList<>();
+    }
+
+    public static boolean validatePublic(byte[] signature, PublicKey publicKey) throws InvalidKeyException, SignatureException {
+        var sign = KeyHelper.createSignature();
+        sign.initVerify(publicKey);
+        return sign.verify(signature);
+    }
+
+    public static boolean validatePrivate(byte[] signature, PrivateKey privateKey) throws InvalidKeyException, SignatureException {
+        var sign = KeyHelper.createSignature();
+        sign.initSign(privateKey);
+        sign.update(SHARED_SINGABLE);
+        return Arrays.equals(sign.sign(), signature);
+    }
+
+    private static byte[] signData(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException, SignatureException {
+        var sign = KeyHelper.createSignature();
+        sign.initSign(privateKey);
+        sign.update(SHARED_SINGABLE);
+        return sign.sign();
     }
 
     public void generateFull(int amount) throws SignatureException, InvalidKeyException { //this creates keys, which is only for our node
@@ -80,26 +103,6 @@ public class StakeKeys {
 
     public void setPrivateKeys(List<PrivateKey> privateKeys) {
         this.privateKeys = privateKeys;
-    }
-
-    public static boolean validatePublic(byte[] signature, PublicKey publicKey) throws InvalidKeyException, SignatureException {
-        var sign = KeyHelper.createSignature();
-        sign.initVerify(publicKey);
-        return sign.verify(signature);
-    }
-
-    public static boolean validatePrivate(byte[] signature, PrivateKey privateKey) throws InvalidKeyException, SignatureException {
-        var sign = KeyHelper.createSignature();
-        sign.initSign(privateKey);
-        sign.update(SHARED_SINGABLE);
-        return Arrays.equals(sign.sign(), signature);
-    }
-
-    private static byte[] signData(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException, SignatureException {
-        var sign = KeyHelper.createSignature();
-        sign.initSign(privateKey);
-        sign.update(SHARED_SINGABLE);
-        return sign.sign();
     }
 
     public String toString() {

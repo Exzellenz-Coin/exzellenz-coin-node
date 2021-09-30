@@ -6,10 +6,6 @@ import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.server.Peer;
 import mainpackage.server.message.AbstractMessage;
-import mainpackage.util.Pair;
-
-import java.security.PublicKey;
-import java.util.List;
 
 public class CreatedStakingTransactionMessage extends AbstractMessage {
     @JsonIgnore

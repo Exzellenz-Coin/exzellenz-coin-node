@@ -7,7 +7,6 @@ import mainpackage.server.message.AbstractMessage;
 import mainpackage.server.message.chain.SendChainLengthMessage;
 
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class SendBlockMessage extends AbstractMessage {
     @JsonProperty
@@ -16,7 +15,9 @@ public class SendBlockMessage extends AbstractMessage {
     private SendBlockMessage() {
     }
 
-    public SendBlockMessage(Block block) { this.block = block; }
+    public SendBlockMessage(Block block) {
+        this.block = block;
+    }
 
     @Override
     public void handle(Peer sender) {

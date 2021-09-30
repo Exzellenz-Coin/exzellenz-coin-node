@@ -2,7 +2,7 @@ package mainpackage.util;
 
 import java.util.Objects;
 
-public record Pair<A,B>(A one, B two) {
+public record Pair<A, B>(A one, B two) {
     @Override
     public boolean equals(Object o) {
         if (o instanceof Pair<?, ?> pair) {

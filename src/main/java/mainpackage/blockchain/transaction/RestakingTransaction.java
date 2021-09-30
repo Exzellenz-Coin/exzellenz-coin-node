@@ -10,6 +10,7 @@ import java.util.List;
 public class RestakingTransaction extends Transaction {
     public static String ID = "RESTAKE";
     public static PublicKey STAKING_WALLET; //locked wallet
+
     static {
         try {
             STAKING_WALLET = KeyHelper.loadPublicKey("staking_wallet.der");

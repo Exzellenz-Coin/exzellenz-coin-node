@@ -71,14 +71,14 @@ public class Block implements Signable {
         var transaction = new RewardTransaction(
                 Chain.FOUNDER_WALLET,
                 BigDecimal.valueOf(100),
-                new byte[] {74, -24, -41, 21, -46, 60, -79, -87, 12, 69, 120, -27, 19, 54, -39, -128, -24, -81, -126, -46, -18, -44, -69, -33, -62, -83, -104, -90, -33, -6, 92, -63, -117, 76, -18, 76, -36, -109, -76, -91, -15, -70, -118, 22, -112, -53, 100, -2, -126, 53, -9, -84, -23, -77, 1, -91, 110, 39, -36, 41, 115, -89, -28, 4});
+                new byte[]{74, -24, -41, 21, -46, 60, -79, -87, 12, 69, 120, -27, 19, 54, -39, -128, -24, -81, -126, -46, -18, -44, -69, -33, -62, -83, -104, -90, -33, -6, 92, -63, -117, 76, -18, 76, -36, -109, -76, -91, -15, -70, -118, 22, -112, -53, 100, -2, -126, 53, -9, -84, -23, -77, 1, -91, 110, 39, -36, 41, 115, -89, -28, 4});
         var block = new Block(
                 null,
                 0,
                 Collections.singletonList(transaction),
                 0,
                 Chain.FOUNDER_WALLET,
-                new byte[] {24, 43, -43, 65, 89, 32, 113, 53, -44, 87, 12, 101, 82, 49, 31, -119, -76, 86, -117, 52, 77, 6, -80, 59, 33, 57, -2, -119, -14, -51, 127, 44, 16, 62, 48, -17, -73, -28, 3, -124, 22, -127, 4, 54, 54, -71, 56, -21, -117, 26, 27, -66, -19, 15, 13, -110, 2, 107, 107, 112, 109, 30, -90, 3},
+                new byte[]{24, 43, -43, 65, 89, 32, 113, 53, -44, 87, 12, 101, 82, 49, 31, -119, -76, 86, -117, 52, 77, 6, -80, 59, 33, 57, -2, -119, -14, -51, 127, 44, 16, 62, 48, -17, -73, -28, 3, -124, 22, -127, 4, 54, 54, -71, 56, -21, -117, 26, 27, -66, -19, 15, 13, -110, 2, 107, 107, 112, 109, 30, -90, 3},
                 ""
         );
         block.createHash();
@@ -89,7 +89,9 @@ public class Block implements Signable {
         return prevHash;
     }
 
-    public long getBlockNumber() { return blockNumber; }
+    public long getBlockNumber() {
+        return blockNumber;
+    }
 
     public String getHash() {
         return hash;
@@ -103,7 +105,9 @@ public class Block implements Signable {
         return timeStamp;
     }
 
-    public String getMerkelRoot() { return merkelRoot; }
+    public String getMerkelRoot() {
+        return merkelRoot;
+    }
 
     public PublicKey getValidator() {
         return validator;

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 import java.security.Key;
-import java.util.Base64;
 
 public class KeySerializer extends StdSerializer<Key> {
     public KeySerializer() {

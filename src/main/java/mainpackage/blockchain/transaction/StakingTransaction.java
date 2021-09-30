@@ -5,16 +5,15 @@ import mainpackage.util.KeyHelper;
 import mainpackage.util.Pair;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
 public class StakingTransaction extends Transaction {
     public static String ID = "STAKE";
     public static PublicKey STAKING_WALLET; //locked wallet
+
     static {
         try {
             STAKING_WALLET = KeyHelper.loadPublicKey("staking_wallet.der");
