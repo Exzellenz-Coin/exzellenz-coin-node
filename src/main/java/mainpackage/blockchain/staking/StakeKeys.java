@@ -1,11 +1,14 @@
 package mainpackage.blockchain.staking;
 
+import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.util.KeyHelper;
 import mainpackage.util.Pair;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 public class StakeKeys {
@@ -97,5 +100,15 @@ public class StakeKeys {
         sign.initSign(privateKey);
         sign.update(SHARED_SIGNABLE);
         return sign.sign();
+    }
+
+    public String toString() {
+        var strBuilder = new StringBuilder();
+        publicPairs.forEach(e -> strBuilder
+                .append(Transaction.DATA_SPLIT_REGEX)
+                .append(Base64.getEncoder().encodeToString(e.one().getEncoded()))
+                .append(Transaction.DATA_SPLIT_REGEX)
+                .append(Base64.getEncoder().encodeToString(e.two())));
+        return strBuilder.toString();
     }
 }

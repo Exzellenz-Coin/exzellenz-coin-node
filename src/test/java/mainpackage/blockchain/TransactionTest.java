@@ -1,15 +1,21 @@
 package mainpackage.blockchain;
 
+import mainpackage.blockchain.staking.StakeKeys;
 import mainpackage.blockchain.transaction.StakingTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.util.KeyHelper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.Base64;
 
 public class TransactionTest {
     @Test
@@ -23,4 +29,22 @@ public class TransactionTest {
         t1.sign(founderPrivate);
         Assertions.assertTrue(t1.verifySignature(founderPublic));
     }
+
+    @Test
+    @DisplayName("Staking transaction parsing test")
+    public void testStakingParse() throws Exception {
+        StakeKeys keys = new StakeKeys();
+        keys.generateFull(50);
+        System.out.println(Base64.getEncoder().encodeToString(keys.getPublicPairs().get(0).one().getEncoded()));
+        StakingTransaction transaction = new StakingTransaction(null, BigDecimal.TEN, BigDecimal.ONE, keys);
+        var parsedKeys = StakingTransaction.parseDataToObject(transaction.getData().split(Transaction.DATA_SPLIT_REGEX));
+        /*
+        System.out.println(keys.getPublicPairs().get(0).one());
+        System.out.println(parsedKeys.get(0).one());
+        System.out.println(Arrays.toString(keys.getPublicPairs().get(0).two()));
+        System.out.println(Arrays.toString(parsedKeys.get(0).two()));
+        */
+        Assertions.assertEquals(parsedKeys, keys.getPublicPairs());
+    }
+
 }
