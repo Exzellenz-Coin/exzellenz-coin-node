@@ -13,7 +13,7 @@ import java.util.List;
 
 public class StakeKeys {
     private final static String SHARED_DATA = "SIGNME";
-    private final static byte[] SHARED_SIGNABLE = SHARED_DATA.getBytes(StandardCharsets.UTF_8); //every node signs the same data
+    private final static byte[] SHARED_SINGABLE = SHARED_DATA.getBytes(StandardCharsets.UTF_8); //every node signs the same data
     private int amount;
     private int headIndex;
     private List<Pair<PublicKey, byte[]>> publicPairs;
@@ -33,13 +33,13 @@ public class StakeKeys {
         for (int i = 0; i < amount; i++) {
             var kp = KeyHelper.generateKeyPair();
             privateKeys.add(kp.getPrivate());
-            publicPairs.add(new Pair(kp.getPublic(), StakeKeys.signData(kp.getPublic(), kp.getPrivate())));
+            publicPairs.add(new Pair<>(kp.getPublic(), StakeKeys.signData(kp.getPublic(), kp.getPrivate())));
         }
         headIndex = amount;
     }
 
-    public void generateEmpty(List<Pair<PublicKey, byte[]>> publicPairs) throws SignatureException, InvalidKeyException { //initializes empty
-        if (publicPairs != null && publicPairs.size() <= 0)
+    public void generateEmpty(List<Pair<PublicKey, byte[]>> publicPairs) { //initializes empty
+        if (publicPairs == null || publicPairs.size() <= 0)
             throw new IllegalArgumentException("amount of keys is less than 1");
         this.amount = publicPairs.size();
         this.publicPairs = publicPairs;
@@ -91,14 +91,14 @@ public class StakeKeys {
     public static boolean validatePrivate(byte[] signature, PrivateKey privateKey) throws InvalidKeyException, SignatureException {
         var sign = KeyHelper.createSignature();
         sign.initSign(privateKey);
-        sign.update(SHARED_SIGNABLE);
-        return sign.sign().equals(signature);
+        sign.update(SHARED_SINGABLE);
+        return Arrays.equals(sign.sign(), signature);
     }
 
     private static byte[] signData(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException, SignatureException {
         var sign = KeyHelper.createSignature();
         sign.initSign(privateKey);
-        sign.update(SHARED_SIGNABLE);
+        sign.update(SHARED_SINGABLE);
         return sign.sign();
     }
 
