@@ -16,7 +16,7 @@ import java.util.List;
 
 public class StakeKeys {
     private final static String SHARED_DATA = "SIGNME";
-    private final static byte[] SHARED_SINGABLE = SHARED_DATA.getBytes(StandardCharsets.UTF_8); //every node signs the same data
+    private final static byte[] SHARED_SIGNABLE = SHARED_DATA.getBytes(StandardCharsets.UTF_8); //every node signs the same data
     private int amount;
     private int headIndex;
     private List<Pair<PublicKey, byte[]>> publicPairs;
@@ -36,14 +36,14 @@ public class StakeKeys {
     public static boolean validatePrivate(byte[] signature, PrivateKey privateKey) throws InvalidKeyException, SignatureException {
         var sign = KeyHelper.createSignature();
         sign.initSign(privateKey);
-        sign.update(SHARED_SINGABLE);
+        sign.update(SHARED_SIGNABLE);
         return Arrays.equals(sign.sign(), signature);
     }
 
     private static byte[] signData(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException, SignatureException {
         var sign = KeyHelper.createSignature();
         sign.initSign(privateKey);
-        sign.update(SHARED_SINGABLE);
+        sign.update(SHARED_SIGNABLE);
         return sign.sign();
     }
 
