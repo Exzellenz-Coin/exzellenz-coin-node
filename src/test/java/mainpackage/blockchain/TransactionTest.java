@@ -47,4 +47,11 @@ public class TransactionTest {
         Assertions.assertEquals(parsedKeys, keys.getPublicPairs());
     }
 
+    @Test
+    @DisplayName("speed test")
+    public void speedTest() throws Exception {
+        StakeKeys keys = new StakeKeys();
+        keys.generateFull(1000);
+    }
+
 }

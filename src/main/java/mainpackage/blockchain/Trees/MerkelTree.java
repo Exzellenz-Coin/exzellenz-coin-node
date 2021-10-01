@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toCollection;
  * A Merkle Tree implementation inspired from https://www.pranaybathini.com/merkle-tree
  */
 public class MerkelTree {
+    public static String DUMMY_HASH = "";
     /**
      * Creates a tree from the given transactions.
      * This method will store the transactions in their associated leaves.
@@ -20,14 +21,18 @@ public class MerkelTree {
      * @return The Merkel Tree
      */
     public static MerkelNode generateFullTree(List<Transaction> transactions) {
-        int len = transactions.size();
-        if ((len & len - 1) != 0) //must be power of two
-            throw new IllegalArgumentException("Only accepts powers of two");
         List<MerkelNode> childNodes = new ArrayList<>();
 
         for (Transaction transaction : transactions) {
             childNodes.add(new MerkelNode(null, null, transaction)); //construct leaf nodes
         }
+
+        //need power of 2 leaf nodes
+        String lastHash = Hash.createHash(transactions.get(transactions.size() - 1));
+        if (childNodes.size() % 2 != 0 && (childNodes.size() & childNodes.size() - 1) != 0) //make even
+            childNodes.add(new MerkelNode(null, null, lastHash)); //duplicated last valid hash
+        while ((childNodes.size() & childNodes.size() - 1) != 0)
+            childNodes.add(new MerkelNode(null, null, DUMMY_HASH)); //fill with dummy nodes
 
         return buildTree(childNodes);
     }
@@ -40,14 +45,19 @@ public class MerkelTree {
      * @return The Merkel Tree
      */
     public static MerkelNode generateEmptyTree(List<String> hashes) { //builds empty tree, which can be filled
-        int len = hashes.size();
-        if ((len & len - 1) != 0) //must be power of two
-            throw new IllegalArgumentException("Only accepts powers of two");
         List<MerkelNode> childNodes = new ArrayList<>();
 
         for (String hash : hashes) {
             childNodes.add(new MerkelNode(null, null, hash)); //construct leaf nodes
         }
+
+        //need power of 2 leaf nodes
+        String lastHash = hashes.get(hashes.size() - 1);
+        if (childNodes.size() % 2 != 0 && (childNodes.size() & childNodes.size() - 1) != 0) //make even
+            childNodes.add(new MerkelNode(null, null, lastHash)); //duplicated last valid hash
+        while ((childNodes.size() & childNodes.size() - 1) != 0)
+            childNodes.add(new MerkelNode(null, null, "")); //fill with dummy nodes
+
         return buildTree(childNodes);
     }
 
@@ -88,13 +98,16 @@ public class MerkelTree {
         }
 
         if (root.getLeft() != null && root.getRight() != null) {
-            return isComplete(root.getLeft()) && isComplete(root.getRight());
+            return !root.getLeft().getHash().equals(DUMMY_HASH) //special case for uneven transactions
+                    && root.getLeft().getHash().equals(root.getRight().getHash())
+                    || isComplete(root.getLeft()) && isComplete(root.getRight()); //go further down
         } else if (root.getLeft() != null && root.getRight() == null) {
             return isComplete(root.getLeft());
         } else if (root.getLeft() == null && root.getRight() != null) {
             return isComplete(root.getRight());
         } else {
-            return root.getTransaction() != null;
+            return root.getHash().equals(DUMMY_HASH)
+                    || root.getHash() != null && root.getTransaction() != null;
         }
     }
 
