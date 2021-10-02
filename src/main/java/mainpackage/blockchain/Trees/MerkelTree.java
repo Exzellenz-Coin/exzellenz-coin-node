@@ -12,7 +12,6 @@ import static java.util.stream.Collectors.toCollection;
  * A Merkle Tree implementation inspired from https://www.pranaybathini.com/merkle-tree
  */
 public class MerkelTree {
-    public static String DUMMY_HASH = "";
     /**
      * Creates a tree from the given transactions.
      * This method will store the transactions in their associated leaves.
@@ -32,7 +31,7 @@ public class MerkelTree {
         if (childNodes.size() % 2 != 0 && (childNodes.size() & childNodes.size() - 1) != 0) //make even
             childNodes.add(new MerkelNode(null, null, lastHash)); //duplicated last valid hash
         while ((childNodes.size() & childNodes.size() - 1) != 0)
-            childNodes.add(new MerkelNode(null, null, DUMMY_HASH)); //fill with dummy nodes
+            childNodes.add(null); //fill with dummy nodes
 
         return buildTree(childNodes);
     }
@@ -56,7 +55,7 @@ public class MerkelTree {
         if (childNodes.size() % 2 != 0 && (childNodes.size() & childNodes.size() - 1) != 0) //make even
             childNodes.add(new MerkelNode(null, null, lastHash)); //duplicated last valid hash
         while ((childNodes.size() & childNodes.size() - 1) != 0)
-            childNodes.add(new MerkelNode(null, null, "")); //fill with dummy nodes
+            childNodes.add(null); //fill with null for 2^n children
 
         return buildTree(childNodes);
     }
@@ -66,18 +65,18 @@ public class MerkelTree {
         while (children.size() != 1) {
             int index = 0, length = children.size();
             while (index < length) {
-                MerkelNode leftChild = children.get(index);
-                MerkelNode rightChild;
+                MerkelNode leftChild = children.get(index++);
+                MerkelNode rightChild = children.get(index++);
 
-                if ((index + 1) < length) {
-                    rightChild = children.get(index + 1);
+                if (leftChild == null) {
+                    parents.add(null);
+                } else if (rightChild == null) {
+                    String parentHash = Hash.createHash(leftChild, leftChild);
+                    parents.add(new MerkelNode(leftChild, leftChild, parentHash));
                 } else {
-                    rightChild = new MerkelNode(null, null, leftChild.getHash());
+                    String parentHash = Hash.createHash(leftChild, rightChild);
+                    parents.add(new MerkelNode(leftChild, rightChild, parentHash));
                 }
-
-                String parentHash = Hash.createHash(leftChild, rightChild);
-                parents.add(new MerkelNode(leftChild, rightChild, parentHash));
-                index += 2;
             }
             children = parents;
             parents = new ArrayList<>();
@@ -98,16 +97,14 @@ public class MerkelTree {
         }
 
         if (root.getLeft() != null && root.getRight() != null) {
-            return !root.getLeft().getHash().equals(DUMMY_HASH) //special case for uneven transactions
-                    && root.getLeft().getHash().equals(root.getRight().getHash())
+            return root.getLeft().getHash().equals(root.getRight().getHash())
                     || isComplete(root.getLeft()) && isComplete(root.getRight()); //go further down
         } else if (root.getLeft() != null && root.getRight() == null) {
             return isComplete(root.getLeft());
         } else if (root.getLeft() == null && root.getRight() != null) {
             return isComplete(root.getRight());
         } else {
-            return root.getHash().equals(DUMMY_HASH)
-                    || root.getHash() != null && root.getTransaction() != null;
+            return root.getHash() != null && root.getTransaction() != null;
         }
     }
 
