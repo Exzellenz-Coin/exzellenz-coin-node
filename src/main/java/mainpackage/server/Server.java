@@ -24,13 +24,13 @@ import java.util.UUID;
 public class Server extends Thread {
     protected static final Logger logger = LogManager.getLogger(Server.class);
     // The default port of the ServerSocket
-    protected static final int DEFAULT_PORT = 1337;
+    public static final int DEFAULT_PORT = 1337;
     // The maximum size of the message cache
     protected static final int MAX_MSG_CACHE_SIZE = 100;
     // A reference to the node that this Server belongs to
     protected final INode node;
     // The actual port of the ServerSocket
-    protected final int port;
+    public final int port;
     // The list of active peers
     protected List<Peer> peers;
     // The cache of already received messages

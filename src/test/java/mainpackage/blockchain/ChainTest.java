@@ -41,7 +41,7 @@ public class ChainTest {
         transaction.sign(wallet1.getPrivate());
         block.sign(wallet1.getPrivate());
         block.createHash();
-        chain.tryAddBlockSync(block);
+        chain.addBlock(block); //must force add the block, since only the root wallet can add the first 100 blocks
         assertEquals(block, chain.getHead(), "A wrong head was set for the mainpackage.blockchain!");
     }
 
@@ -52,7 +52,8 @@ public class ChainTest {
         KeyPair wallet2 = KeyHelper.generateKeyPair();
         Transaction transaction = new Transaction(wallet1.getPublic(), wallet2.getPublic(), BigDecimal.ONE, BigDecimal.ZERO, "");
         Block illegalBlock = new Block("I am an illegal hash :)", 0, Collections.singletonList(transaction), null);
-        assertFalse(chain.tryAddBlockSync(illegalBlock));
+        assertFalse(chain.isValidNewBlock(illegalBlock)); //hash is wrong
+        assertFalse(chain.tryAddBlockSync(illegalBlock)); //validator is wrong
     }
 
     @Test

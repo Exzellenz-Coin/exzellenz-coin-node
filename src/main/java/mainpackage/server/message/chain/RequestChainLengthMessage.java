@@ -9,7 +9,7 @@ public class RequestChainLengthMessage extends AbstractMessage {
     @Override
     public void handle(Peer sender) {
         try {
-            sender.send(new SendChainLengthMessage(sender.getNode().getBlockChain().size()));
+            sender.send(new SendChainLengthMessage((int)sender.getNode().getBlockChain().size()));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -10,6 +10,7 @@ import mainpackage.blockchain.transaction.UnstakingTransaction;
 import mainpackage.server.Server;
 import mainpackage.server.message.block.CreatedBlockMessage;
 import mainpackage.server.message.chain.RequestChainLengthMessage;
+import mainpackage.server.message.transaction.CreatedRestakingTransactionMessage;
 import mainpackage.server.message.transaction.CreatedStakingTransactionMessage;
 import mainpackage.server.message.transaction.CreatedTransactionMessage;
 import mainpackage.server.message.transaction.CreatedUnstakingTransactionMessage;
@@ -167,7 +168,9 @@ public class FullNode implements INode {
 
     @Override
     public boolean addTransaction(Transaction transaction) {
-        if (Transaction.validValues(transaction) && !unofficialTransactions.contains(transaction) && blockChain.isValidTransaction(transaction)) {
+        if (Transaction.validValues(transaction)
+                && !unofficialTransactions.contains(transaction)
+                && blockChain.isValidTransaction(transaction)) {
             unofficialTransactions.add(transaction);
             server.sendToAll(new CreatedTransactionMessage(transaction));
             return true;
@@ -201,7 +204,7 @@ public class FullNode implements INode {
         RestakingTransaction transaction = new RestakingTransaction(nodeWallet, amount, DEFAULT_TIP);
         transaction.sign(nodePrivateKey);
         if (addTransaction(transaction)) {
-            server.sendToAll(new CreatedTransactionMessage(transaction));
+            server.sendToAll(new CreatedRestakingTransactionMessage(transaction));
             return true;
         }
         return false;

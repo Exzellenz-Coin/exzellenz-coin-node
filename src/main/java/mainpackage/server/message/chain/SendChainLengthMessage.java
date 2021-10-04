@@ -20,10 +20,10 @@ public class SendChainLengthMessage extends AbstractMessage {
 
     @Override
     public void handle(Peer sender) {
-        int curBlockChainSize = sender.getNode().getBlockChain().size();
+        int curBlockChainSize = (int)sender.getNode().getBlockChain().size();
         if (this.chainLength > curBlockChainSize) {
             try {
-                sender.send(new RequestBlockMessage(curBlockChainSize + 1));
+                sender.send(new RequestBlockMessage(curBlockChainSize)); //request new block from the longer chain
             } catch (IOException e) {
                 e.printStackTrace();
             }

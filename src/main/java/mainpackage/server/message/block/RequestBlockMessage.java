@@ -8,19 +8,19 @@ import java.io.IOException;
 
 public class RequestBlockMessage extends AbstractMessage {
     @JsonProperty
-    private int blockNumber;
+    private int blockIndex;
 
     private RequestBlockMessage() {
     }
 
-    public RequestBlockMessage(int blockNumber) {
-        this.blockNumber = blockNumber;
+    public RequestBlockMessage(int blockIndex) {
+        this.blockIndex = blockIndex;
     }
 
     @Override
     public void handle(Peer sender) {
         try {
-            sender.send(new SendBlockMessage(sender.getNode().getBlockChain().get(blockNumber)));
+            sender.send(new SendBlockMessage(sender.getNode().getBlockChain().get(blockIndex)));
         } catch (IOException e) {
             e.printStackTrace();
         }
