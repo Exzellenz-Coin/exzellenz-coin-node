@@ -38,7 +38,6 @@ public class ExcellenceCoinNode {
         //activity loop
         class UpdateTask extends TimerTask
         {
-            public static int i = 0;
             public void run()
             {
                 node.update();

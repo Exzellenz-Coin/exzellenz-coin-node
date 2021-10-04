@@ -21,8 +21,6 @@ public class SendBlockMessage extends AbstractMessage {
 
     @Override
     public void handle(Peer sender) {
-        //attempt add ticket
-
         //attempt add block
         if (sender.getNode().getBlockChain().tryAddBlockSync(this.block)) {
             try {

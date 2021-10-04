@@ -30,7 +30,7 @@ public class Server extends Thread {
     // A reference to the node that this Server belongs to
     protected final INode node;
     // The actual port of the ServerSocket
-    public final int port;
+    protected final int port;
     // The list of active peers
     protected List<Peer> peers;
     // The cache of already received messages
