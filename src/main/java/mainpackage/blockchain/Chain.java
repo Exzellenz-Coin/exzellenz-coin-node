@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Chain {
-    private static final long MIN_BLOCK_DELAY = 1; //TODO: set to something reasonable
+    private static final long MIN_BLOCK_DELAY = 10000; //TODO: set to something reasonable
     private static final BigDecimal INITIAL_REWARD = BigDecimal.valueOf(100);
     private static final BigDecimal MIN_STAKE = BigDecimal.valueOf(69); //minimum stake to become a staker
     private static final BigDecimal PENALTY = BigDecimal.ONE; //penalty for stakers that do not valdiate a block
@@ -52,7 +52,7 @@ public class Chain {
     public void addBlock(final Block block) {
         blockChain.add(block);
         updateWallets(blockChain.size() - 1);
-        if (block.getBlockNumber() % EPOCH == 0 && block.getBlockNumber() != 0) { //new epoch started
+        if (block.getBlockNumber() % EPOCH == 0 && block.getBlockNumber() != 0) { //new epoch started, so get new stakers
             extractValidators(block.getBlockNumber());
         }
         this.tryAddBlockSync(block);

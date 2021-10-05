@@ -114,13 +114,12 @@ public class ChainTest {
 	}
 
 	@Test
-    @Disabled //todo: working on this
 	@DisplayName("Update Wallet Test")
 	public void testWalletCache() {
 		assertEquals(BigDecimal.valueOf(100), chain.getAmount(Chain.FOUNDER_WALLET)); //initial funds
 		chain.addBlock(new Block(
 						chain.getHead().getHash(),
-                        0,
+                        1,
 						Collections.singletonList(new Transaction(
 								Chain.FOUNDER_WALLET,
 								StakingTransaction.STAKING_WALLET,
@@ -131,6 +130,7 @@ public class ChainTest {
 						Chain.FOUNDER_WALLET
 				)
 		);
+		//200 (original amount) - 4 (amount send) - 1 (tip send) + 1 (tip received) + 100 (reward for block number 1) = 196
 		assertEquals(BigDecimal.valueOf(196).setScale(Transaction.DOWN_ROUNDING_SCALE, RoundingMode.DOWN), chain.getAmount(Chain.FOUNDER_WALLET)); //initial funds
 		assertEquals(BigDecimal.valueOf(4), chain.getAmount(StakingTransaction.STAKING_WALLET)); //initial funds
 	}

@@ -20,6 +20,7 @@ public class MerkelTest {
     @Test
     @DisplayName("Common merkel tree operations Test")
     public void testMerkelPower2() {
+        runMerkelTests(2);
         runMerkelTests(4);
         runMerkelTests(8);
         runMerkelTests(16);
@@ -29,6 +30,8 @@ public class MerkelTest {
     @Test
     @DisplayName("Common merkel tree operations non power of 2 transactions Test")
     public void testMerkelNonPower2() {
+        runMerkelTests(1);
+        runMerkelTests(3);
         runMerkelTests(7);
         runMerkelTests(9);
         runMerkelTests(17);
@@ -37,7 +40,6 @@ public class MerkelTest {
 
     public void runMerkelTests(int numTransactions) {
         ArrayList<Transaction> transactions = new ArrayList<>();
-        // Create 8 Transactions
         for (int i = 0; i < numTransactions; i++)
             transactions.add(new Transaction(Chain.FOUNDER_WALLET, StakingTransaction.STAKING_WALLET, BigDecimal.valueOf(1 + i), BigDecimal.valueOf(0.1 + i), ""));
 
@@ -64,6 +66,7 @@ public class MerkelTest {
 
         // Get needed verification elements and attempt verify
         String hashToVerify = Hash.createHash(transactions.get(numTransactions/2)); //some middle transaction hash
+        //System.out.println(hashOnlyTree.getLeft().getHash().equals(hashToVerify) && hashOnlyTree.getRight().getHash().equals(hashToVerify));
         List<Pair<String, Boolean>> minHashes = MerkelTree.hashesNeededToVerifyTransaction(hashOnlyTree, hashToVerify);
         assertNotNull(minHashes);
         assertTrue(MerkelTree.verify(minHashes, hashOnlyTree.getHash(), hashToVerify));

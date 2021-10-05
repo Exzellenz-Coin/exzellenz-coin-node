@@ -10,8 +10,8 @@ import java.util.TimerTask;
 
 public class ExcellenceCoinNode {
     public static int DEFAULT_DELAY = 1000; //initial delay
-    public static int DEFAULT_PERIOD = 500; //delay between update calls
-    public static boolean DEFAULT_FIRST_NODE_STATUS = false;
+    public static int DEFAULT_PERIOD = 1000; //delay between update calls
+    public static boolean DEFAULT_FIRST_NODE_STATUS = true; //TODO: set this to true in release version
     /**
      * Executing this program requires the following JVM arguments:
      *

@@ -30,11 +30,8 @@ public interface INode {
 
     /**
      * Attempts to validate the NewBlock
-     *
-     * @param force If despite not being the validator we still want to attempt andvalidate
-     * @return If addition and adding was successful
      */
-    boolean validateBlock(boolean force);
+    void validateBlock();
 
     /**
      * Method to get the server that is responsible for connecting to the node network.
@@ -125,6 +122,7 @@ public interface INode {
 
     /**
      * Finalize the newBlock for publication
+     * @return If newBlock was successfully updated
      */
-    void finalizeBlock() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException;
+    boolean finalizeBlock();
 }

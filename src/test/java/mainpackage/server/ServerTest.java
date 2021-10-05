@@ -113,7 +113,7 @@ public class ServerTest {
         t1.sign(founderPrivate);
         assertTrue(node1.addTransaction(t1));
         //add to lock blockchain
-        assertTrue(node1.validateBlock(false));
+        node1.validateBlock();
         Thread.sleep(100);
         //test for actual changes
         assertThat(node1.getBlockChain().size()).isEqualTo(2);

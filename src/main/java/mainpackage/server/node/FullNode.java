@@ -3,10 +3,7 @@ package mainpackage.server.node;
 import mainpackage.blockchain.Block;
 import mainpackage.blockchain.Chain;
 import mainpackage.blockchain.staking.StakeKeys;
-import mainpackage.blockchain.transaction.RestakingTransaction;
-import mainpackage.blockchain.transaction.StakingTransaction;
-import mainpackage.blockchain.transaction.Transaction;
-import mainpackage.blockchain.transaction.UnstakingTransaction;
+import mainpackage.blockchain.transaction.*;
 import mainpackage.server.Server;
 import mainpackage.server.message.block.CreatedBlockMessage;
 import mainpackage.server.message.chain.RequestChainLengthMessage;
@@ -23,10 +20,7 @@ import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * An implementation of INode that can perform every possible action.
@@ -52,8 +46,10 @@ public class FullNode implements INode {
         this.newBlock = null; //have to set this after you have the newest blockchain
         this.stakeKeys = new StakeKeys(); //these need to be set based on the epoch
         try {
-            nodeWallet = KeyHelper.loadPublicKey("node_wallet.der");
-            nodePrivateKey = KeyHelper.loadPrivateKey("node_pk.der");
+            //nodeWallet = KeyHelper.loadPublicKey("node_wallet.der");
+            //nodePrivateKey = KeyHelper.loadPrivateKey("node_pk.der"); //TODO: change this back on release
+            nodeWallet = KeyHelper.loadPublicKey("founder_wallet.der");
+            nodePrivateKey = KeyHelper.loadPrivateKey("founder_pk.der");
         } catch (Exception e) {
             e.printStackTrace();
             nodeWallet = null;
@@ -70,6 +66,10 @@ public class FullNode implements INode {
     @Override
     public void update() {
         server.sendToAll(new RequestChainLengthMessage()); //get most recent chain
+        if (blockChain.permittedToValidateNewBlock(nodeWallet)) {
+            logger.debug("Attempting to create block number %d".formatted(blockChain.size()));
+            validateBlock();
+        }
     }
 
     @Override
@@ -78,35 +78,46 @@ public class FullNode implements INode {
     }
 
     @Override
-    public boolean validateBlock(boolean force) { //if validator is chosen by the system they can add a block and claim rewards
-        try {
-            finalizeBlock(); //creates and populates a valid newBlock
-        } catch (Exception e) {
-            return false;
+    public void validateBlock() {
+        if (finalizeBlock()) { //creates and populates a valid newBlock
+            if (blockChain.tryAddBlockSync(newBlock)) {
+                logger.debug("Block number %d with %d transactions successfully created".formatted(newBlock.getBlockNumber(), newBlock.getTransactions().size()));
+                server.sendToAll(new CreatedBlockMessage(newBlock, stakeKeys.popPrivateKey()));
+            }
         }
-        if ((force || blockChain.permittedToValidateNewBlock(nodeWallet)) && blockChain.tryAddBlockSync(newBlock)) {
-            server.sendToAll(new CreatedBlockMessage(newBlock, stakeKeys.popPrivateKey()));
-            return true;
-        }
-        return false;
     }
 
     @Override
-    public void finalizeBlock() throws SignatureException, InvalidKeyException {
-        //template block
-        newBlock = new Block(blockChain.getHead().getHash(), blockChain.getHead().getBlockNumber() + 1, new ArrayList<>(), nodeWallet);
-        //sort transactions based on highest tips and add to the block
-        unofficialTransactions.sort(Comparator.comparing(Transaction::getTip));
-        while (unofficialTransactions.size() != 0 && newBlock.getTransactions().size() != Block.MAX_TRANSACTIONS) {
-            Transaction cur = unofficialTransactions.get(0);
-            if (blockChain.isValidTransaction(cur)) {
-                newBlock.getTransactions().add(cur);
+    public boolean finalizeBlock() {
+        try {
+            //copy of our transactions so we can revert in case of an error
+            ArrayList<Transaction> unofficialTransactionsCopy = new ArrayList<>(unofficialTransactions);
+            ArrayList<Transaction> blockTransactions = new ArrayList<>();
+            //sort transactions based on highest tips and add to the block
+            unofficialTransactionsCopy.sort(Comparator.comparing(Transaction::getTip));
+            while (unofficialTransactionsCopy.size() != 0 && blockTransactions.size() != Block.MAX_TRANSACTIONS) {
+                Transaction cur = unofficialTransactionsCopy.get(0);
+                if (blockChain.isValidTransaction(cur)) {
+                    blockTransactions.add(cur);
+                }
+                unofficialTransactionsCopy.remove(0); //removes invalid and used transactions
             }
-            unofficialTransactions.remove(0); //removes invalid and used transactions
+            //add reward transaction
+            Transaction rewardTransaction = new RewardTransaction(nodeWallet, blockChain.calculateReward(blockChain.getHead().getBlockNumber() + 1));
+            rewardTransaction.sign(nodePrivateKey);
+            blockTransactions.add(rewardTransaction);
+            unofficialTransactions = unofficialTransactionsCopy; //finalize transactions that where used
+            //populate newBlock
+            newBlock = new Block(blockChain.getHead().getHash(), blockChain.getHead().getBlockNumber() + 1, blockTransactions, nodeWallet);
+            //sign and hash
+            newBlock.sign(nodePrivateKey);
+            newBlock.createHash();
+            return true;
+        } catch (Exception ignored) {
+            logger.debug("Failed creating a valid block. Aborting send");
+            //ignored.printStackTrace();
+            return false;
         }
-        //sign and hash
-        newBlock.sign(nodePrivateKey);
-        newBlock.createHash();
     }
 
     @Override

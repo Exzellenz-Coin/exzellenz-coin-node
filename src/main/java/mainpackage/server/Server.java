@@ -95,7 +95,7 @@ public class Server extends Thread {
      */
     public void sendToAll(AbstractMessage message) {
         cacheReceivedMessage(message.getId());
-        logger.debug("Sending message to %d peers".formatted(peers.size()));
+        logger.debug("Sending %s to %d peers".formatted(message.getClass().getSimpleName(), peers.size()));
         for (Peer peer : peers) {
             try {
                 peer.send(message);

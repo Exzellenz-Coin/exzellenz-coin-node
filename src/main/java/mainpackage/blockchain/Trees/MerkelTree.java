@@ -196,6 +196,9 @@ public class MerkelTree {
             System.out.println("------------need to send-----------------");
         */
         List<Pair<String, Boolean>> hashes = new ArrayList<>(); //the if the boolean is true, the node was right
+        if (root.getLeft() == null && root.getRight() == null) { //special case for tree of size 1
+            return hashes;
+        }
         String curHash = transactionHash;
         for (int i = path.size() - 2; i != -1; i--) { //reverse traverse and skip root
             MerkelNode node = path.get(i);

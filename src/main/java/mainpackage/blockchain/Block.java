@@ -1,5 +1,6 @@
 package mainpackage.blockchain;
 
+import mainpackage.blockchain.Trees.MerkelTree;
 import mainpackage.blockchain.transaction.RewardTransaction;
 import mainpackage.blockchain.transaction.Transaction;
 import mainpackage.util.KeyHelper;
@@ -33,6 +34,7 @@ public class Block implements Signable {
         this.prevHash = prevHash;
         this.blockNumber = blockNumber;
         this.transactions = transactions;
+        this.merkelRoot = MerkelTree.generateFullTree(transactions).getHash();
         this.validator = validator;
         this.timeStamp = System.currentTimeMillis();
     }
@@ -41,6 +43,7 @@ public class Block implements Signable {
         this.prevHash = prevHash;
         this.blockNumber = blockNumber;
         this.transactions = transactions;
+        this.merkelRoot = MerkelTree.generateFullTree(transactions).getHash();
         this.timeStamp = timeStamp;
         this.validator = validator;
         this.signature = signature;
